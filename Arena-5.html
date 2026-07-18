@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIFA World Cup 2026 - ArenaOS AI Command Center</title>
+    <meta name="description" content="FIFA World Cup 2026 GenAI-Enabled Stadium Operations Command Center" />
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
+    </script>
+    <!-- QRCode.js for ticket QR generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
+    <style>
+        /* ─── CSS Variables ─────────────────────────────────────── */
+        :root {
+            --color-bg-base: #020617;
+            --color-border: rgba(30, 41, 59, 0.7);
+            --glass-bg: rgba(8, 15, 30, 0.65);
+            --glass-border: rgba(99, 102, 241, 0.15);
+            --glow-indigo: 0 0 25px rgba(99, 102, 241, 0.12);
+            --accent-indigo: #6366f1;
+            --accent-teal: #14b8a6;
+            --font-base: 16px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--color-bg-base);
+            background-image: radial-gradient(ellipse at 15% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 75%, rgba(139, 92, 246, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(20, 184, 166, 0.04) 0%, transparent 60%);
+            font-size: var(--font-base);
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .gradient-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: gradient-shift 12s ease-in-out infinite alternate;
+        }
+        @keyframes gradient-shift {
+            0% {
+                opacity: 0.6;
+                transform: scale(1);
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+                filter: hue-rotate(15deg);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1.02);
+                filter: hue-rotate(30deg);
+            }
+        }
+
+        .particle-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+        .font-jetmono {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        .text-\[9px\] {
+            font-size: 12px !important;
+        }
+        .text-\[10px\] {
+            font-size: 13px !important;
+        }
+        .text-\[11px\] {
+            font-size: 14px !important;
+        }
+        .text-xs {
+            font-size: 14px !important;
+        }
+        .text-sm {
+            font-size: 15.5px !important;
+        }
+        .text-base {
+            font-size: 17px !important;
+        }
+        .text-lg {
+            font-size: 19px !important;
+        }
+        .text-xl {
+            font-size: 21px !important;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(30, 41, 59, 0.7);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            backdrop-filter: blur(8px);
+            transition: border-color 0.3s ease;
+        }
+        .status-badge:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--glow-indigo);
+            border-radius: 1rem;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.4), 0 0 30px rgba(99, 102, 241, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .panel-anim {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        .metric-card {
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(30, 41, 59, 0.6);
+            padding: 12px 8px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .scenario-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13.5px;
+        }
+        .scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+        }
+        .scenario-btn.active {
+            background-color: rgba(79, 70, 229, 0.2) !important;
+            border-color: rgba(99, 102, 241, 0.8) !important;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            transform: scale(1.03);
+        }
+
+        .ai-output-box {
+            transition: all 0.4s ease;
+        }
+        .ai-output-box.processing {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.15), inset 0 0 20px rgba(99, 102, 241, 0.03);
+        }
+
+        .smartphone-frame {
+            background: #0a0f1a;
+            border-color: #1e293b;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7),
+                0 0 50px rgba(99, 102, 241, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
+            font-size: 14px;
+        }
+        .smartphone-frame:hover {
+            transform: translateY(-4px) rotateX(2deg);
+            box-shadow: 0 40px 80px -16px rgba(0, 0, 0, 0.75),
+                0 0 60px rgba(99, 102, 241, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .ticket-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(99, 102, 241, 0.06), transparent 30%);
+            animation: ticket-shimmer 4s linear infinite;
+        }
+        @keyframes ticket-shimmer {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fan-action-btn,
+        .vol-action-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .fan-action-btn:active,
+        .vol-action-btn:active {
+            transform: scale(0.93);
+        }
+        .fan-action-btn:hover,
+        .vol-action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .pulse-ring-container {
+            position: relative;
+        }
+        .pulse-ring-container::before,
+        .pulse-ring-container::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(99, 102, 241, 0.5);
+            animation: pulse-ring-expand 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .pulse-ring-container::after {
+            inset: -10px;
+            border-color: rgba(99, 102, 241, 0.25);
+            animation-delay: 0.6s;
+        }
+        @keyframes pulse-ring-expand {
+            0% {
+                transform: scale(0.92);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        #waveform-canvas {
+            border-radius: 8px;
+            background: rgba(2, 6, 23, 0.8);
+        }
+
+        .chat-bubble-agent {
+            position: relative;
+            max-width: 90%;
+            align-self: flex-start;
+            font-size: 13px;
+            border-bottom-left-radius: 4px;
+            line-height: 1.5;
+        }
+        .chat-bubble-user {
+            position: relative;
+            max-width: 90%;
+            align-self: flex-end;
+            font-size: 13px;
+            border-bottom-right-radius: 4px;
+            line-height: 1.5;
+        }
+
+        .preset-instruction-btn {
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        .preset-instruction-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .quick-chip {
+            font-size: 12px;
+            transition: all 0.18s ease;
+        }
+        .quick-chip:hover {
+            transform: scale(1.05);
+        }
+        .quick-chip:active {
+            transform: scale(0.95);
+        }
+
+        #vol-directives-feed {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        .action-item-reveal {
+            opacity: 0;
+            transform: translateX(-12px);
+        }
+
+        #btn-broadcast-alert:not([disabled]) {
+            animation: btn-ready-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes btn-ready-glow {
+            0% {
+                box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.6), 0 0 60px rgba(99, 102, 241, 0.2);
+            }
+        }
+
+        .fan-action-btn.triggered {
+            background-color: rgba(99, 102, 241, 0.25) !important;
+            border-color: rgba(99, 102, 241, 0.7) !important;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+        .vol-action-btn.triggered {
+            background-color: rgba(20, 184, 166, 0.25) !important;
+            border-color: rgba(20, 184, 166, 0.7) !important;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.2);
+        }
+
+        #btn-toggle-volunteers.active-overlay {
+            background: rgba(20, 184, 166, 0.25) !important;
+            border-color: rgba(20, 184, 166, 0.6) !important;
+        }
+        #btn-toggle-flow.active-overlay {
+            background: rgba(99, 102, 241, 0.25) !important;
+            border-color: rgba(99, 102, 241, 0.6) !important;
+        }
+
+        .high-contrast-mode {
+            --color-bg-base: #000000;
+            --color-border: #ffffff;
+            --glass-bg: #0f0f0f;
+            --glass-border: #ffffff;
+        }
+        .high-contrast-mode body {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+        .high-contrast-mode .glass-panel,
+        .high-contrast-mode .smartphone-frame {
+            background: #000000 !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: none !important;
+        }
+        .high-contrast-mode .text-slate-400,
+        .high-contrast-mode .text-slate-500 {
+            color: #e2e8f0 !important;
+        }
+        .high-contrast-mode select,
+        .high-contrast-mode input {
+            border: 1.5px solid #ffffff !important;
+            background: #000000 !important;
+            color: #ffffff !important;
+        }
+        .high-contrast-mode button {
+            border: 1.5px solid #ffffff !important;
+            background: #000000 !important;
+            color: #ffffff !important;
+        }
+        .high-contrast-mode button:hover {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        .high-contrast-mode .chat-bubble-agent {
+            background-color: #1a1a1a !important;
+            border: 1px solid #ffffff !important;
+            color: #ffffff !important;
+        }
+        .high-contrast-mode .chat-bubble-user {
+            background-color: #00007f !important;
+            border: 1px solid #ffffff !important;
+            color: #ffffff !important;
+        }
+        .high-contrast-mode .particle-bg {
+            display: none;
+        }
+
+        .large-text-mode {
+            font-size: 1.25rem;
+        }
+        .large-text-mode h1 {
+            font-size: 2rem !important;
+        }
+        .large-text-mode h2 {
+            font-size: 1.6rem !important;
+        }
+        .large-text-mode p,
+        .large-text-mode span,
+        .large-text-mode select,
+        .large-text-mode button,
+        .large-text-mode input,
+        .large-text-mode .text-xs,
+        .large-text-mode .text-\[10px\],
+        .large-text-mode .text-\[11px\] {
+            font-size: 1rem !important;
+        }
+        .large-text-mode .chat-bubble-agent,
+        .large-text-mode .chat-bubble-user {
+            font-size: 1.05rem !important;
+        }
+
+        .chat-message-enter {
+            animation: chat-slide-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes chat-slide-up {
+            0% {
+                opacity: 0;
+                transform: translateY(16px) scale(0.94);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .directive-item {
+            animation: directive-slide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes directive-slide {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .broadcast-slide {
+            animation: broadcast-slide 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes broadcast-slide {
+            0% {
+                opacity: 0;
+                transform: translateY(-60px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .congestion-bar-glow {
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #chat-messages {
+            scroll-behavior: smooth;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        #chat-messages::-webkit-scrollbar {
+            width: 3px;
+        }
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 999px;
+        }
+
+        .mode-toggle-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .mode-toggle-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .mode-toggle-btn:hover::after {
+            opacity: 1;
+        }
+        .mode-toggle-btn.active-mode {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+        }
+        .mode-toggle-btn.active-mode::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 9999px;
+            padding: 2px;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .mode-toggle-btn.inactive-mode {
+            background: rgba(30, 41, 59, 0.5) !important;
+            color: #94a3b8 !important;
+            border-color: rgba(71, 85, 105, 0.3) !important;
+        }
+        .mode-toggle-btn.inactive-mode:hover {
+            background: rgba(51, 65, 85, 0.6) !important;
+            color: #e2e8f0 !important;
+        }
+
+        .mode-toggle-container {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(30, 41, 59, 0.6);
+        }
+
+        @media (max-width: 1024px) {
+            .smartphone-frame {
+                width: 100% !important;
+                max-width: 380px;
+                height: 620px !important;
+            }
+        }
+        @media (max-width: 640px) {
+            #telemetry-ticker .status-badge {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+            .glass-panel {
+                padding: 12px !important;
+            }
+            .smartphone-frame {
+                height: 580px !important;
+                border-width: 6px !important;
+                border-radius: 28px !important;
+            }
+        }
+
+        .broadcast-dismiss-btn {
+            transition: all 0.2s ease;
+        }
+        .broadcast-dismiss-btn:hover {
+            transform: scale(1.2);
+            color: #ffffff;
+        }
+
+        #volunteer-mode-sections,
+        #fan-mode-sections {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #volunteer-mode-sections.hidden,
+        #fan-mode-sections.hidden {
+            opacity: 0;
+            transform: scale(0.96);
+            pointer-events: none;
+        }
+        #volunteer-mode-sections:not(.hidden),
+        #fan-mode-sections:not(.hidden) {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        #chat-input {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .seat-selector {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 8px;
+            backdrop-filter: blur(8px);
+        }
+        .seat-selector select {
+            background: transparent;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: #e2e8f0;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .seat-selector select:focus {
+            border-color: #6366f1;
+        }
+        .seat-selector select option {
+            background: #0f172a;
+        }
+
+        .chat-message-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .directive-item {
+            font-size: 12px;
+        }
+
+        /* ─── Ticket verification ──────────────────────────────────── */
+        .ticket-verified {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+        .ticket-verified::before {
+            background: conic-gradient(from 0deg, transparent, rgba(16, 185, 129, 0.15), transparent 30%) !important;
+        }
+        .verify-btn {
+            transition: all 0.25s ease;
+        }
+        .verify-btn:hover {
+            transform: scale(1.05);
+        }
+        .verify-btn:active {
+            transform: scale(0.95);
+        }
+        .verification-badge {
+            animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes badge-pop {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* QR code container */
+        #qrcode {
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+        }
+        #qrcode img {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Particle Background -->
+    <canvas id="particle-canvas" class="particle-bg"></canvas>
+    <div class="gradient-overlay"></div>
+
+    <!-- ─── Header ─────────────────────────────────────────────────── -->
+    <header id="main-header" class="border-b border-slate-800 bg-slate-900/70 backdrop-blur-xl px-5 py-3 flex flex-wrap items-center justify-between z-10 shrink-0 relative">
+        <div class="flex items-center gap-3">
+            <div class="pulse-ring-container">
+                <div class="bg-gradient-to-br from-indigo-600 to-violet-700 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                </div>
+            </div>
+            <div>
+                <h1 class="font-outfit text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    FIFA ArenaOS <span class="bg-gradient-to-r from-teal-400 via-indigo-400 to-violet-400 bg-clip-text text-transparent font-extrabold">AI</span>
+                    <span class="text-xs bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-sans font-medium">World Cup 2026</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-sans">Generative AI Venue Management &amp; Fan Experience Platform</p>
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 text-xs mt-2 md:mt-0" id="telemetry-ticker">
+            <div class="status-badge">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block"></span>
+                <span class="text-slate-400">Live:</span>
+                <span class="text-emerald-400 font-semibold font-mono">NORMAL</span>
+            </div>
+            <div class="status-badge">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span class="text-slate-400">Attendance:</span>
+                <span class="text-white font-semibold font-mono" id="telemetry-attendance">82,410 / 83,000</span>
+            </div>
+            <div class="status-badge">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-indigo-400"></i>
+                <span class="text-slate-400">Latency:</span>
+                <span class="text-teal-400 font-semibold font-mono" id="telemetry-latency">142ms</span>
+            </div>
+            <div class="status-badge">
+                <i data-lucide="leaf" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span class="text-slate-400">CO₂ Saved:</span>
+                <span class="text-emerald-400 font-semibold font-mono" id="telemetry-co2">4.8T</span>
+            </div>
+            <div class="status-badge">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-violet-400"></i>
+                <span class="text-slate-400">AI Engine:</span>
+                <span class="text-violet-300 font-semibold font-mono">Gemini 2.0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ─── Main Layout ────────────────────────────────────────────── -->
+    <main class="flex-1 flex overflow-hidden relative z-10">
+
+        <!-- LEFT: Command Center -->
+        <section class="w-full lg:w-2/3 flex flex-col p-4 overflow-y-auto space-y-4 border-r border-slate-800/60 command-section">
+
+            <!-- Row 1: Heatmap + Sector Telemetry -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+                <!-- Heatmap Panel -->
+                <div class="xl:col-span-2 glass-panel p-4 flex flex-col panel-anim" id="panel-heatmap">
+                    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                        <h2 class="font-outfit text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="map" class="text-indigo-400 w-4 h-4"></i> Live Stadium Sector Heatmap
+                        </h2>
+                        <div class="flex items-center gap-3 text-xs flex-wrap">
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-emerald-500/90 rounded-sm inline-block"></span>Normal</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-amber-500/90 rounded-sm inline-block"></span>Moderate</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-rose-500/90 rounded-sm inline-block"></span>Crowded</span>
+                            <button id="btn-toggle-volunteers" class="flex items-center gap-1 bg-teal-600/20 hover:bg-teal-600/40 border border-teal-500/30 text-teal-300 px-2 py-0.5 rounded text-[10px] transition-all">
+                                <i data-lucide="user-check" class="w-3 h-3"></i> Volunteers
+                            </button>
+                            <button id="btn-toggle-flow" class="flex items-center gap-1 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded text-[10px] transition-all">
+                                <i data-lucide="move" class="w-3 h-3"></i> Flow
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative bg-slate-950/80 border border-slate-800 rounded-xl flex items-center justify-center p-2 min-h-[300px] h-[340px] overflow-hidden">
+                        <canvas id="stadium-heatmap" class="max-w-full max-h-full cursor-pointer rounded-lg"></canvas>
+                        <div class="absolute top-3 right-3 bg-slate-900/80 border border-slate-800 px-2 py-1 rounded text-[11px] text-slate-400 font-mono">Click zones</div>
+                        <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-rose-500/15 border border-rose-500/30 px-2 py-1 rounded text-[10px] text-rose-300 font-mono">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse inline-block"></span> LIVE
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sector Metrics -->
+                <div class="glass-panel p-4 flex flex-col justify-between panel-anim" id="panel-metrics">
+                    <div>
+                        <h2 class="font-outfit text-base font-bold text-white flex items-center gap-2 mb-3">
+                            <i data-lucide="bar-chart-3" class="text-indigo-400 w-4 h-4"></i> Sector Analytics &amp; Queues
+                        </h2>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-400">Selected Zone:</span>
+                                    <span class="text-indigo-300 font-bold text-xs" id="metrics-zone-id">Zone A</span>
+                                </div>
+                                <div class="flex justify-between text-xs mb-1.5">
+                                    <span class="text-slate-400">Congestion Rate:</span>
+                                    <span class="text-amber-400 font-semibold text-xs" id="metrics-congestion">64% (Moderate)</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                                    <div id="metrics-congestion-bar" class="bg-gradient-to-r from-emerald-500 to-amber-500 h-2 rounded-full congestion-bar-glow" style="width: 64%"></div>
+                                </div>
+                            </div>
+                            <hr class="border-slate-800">
+                            <div class="space-y-2">
+                                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest">Queue Forecasts</h3>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5 text-slate-400 text-xs"><i data-lucide="ticket" class="w-3.5 h-3.5 text-indigo-400"></i> Turnstiles Gate 3:</span>
+                                    <span class="font-mono text-rose-400 font-bold text-xs" id="queue-gate">28 min wait</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5 text-slate-400 text-xs"><i data-lucide="soup" class="w-3.5 h-3.5 text-indigo-400"></i> Food Court East:</span>
+                                    <span class="font-mono text-emerald-400 text-xs" id="queue-food">4 min wait</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5 text-slate-400 text-xs"><i data-lucide="bath" class="w-3.5 h-3.5 text-indigo-400"></i> Restrooms Block C:</span>
+                                    <span class="font-mono text-amber-400 text-xs" id="queue-restroom">12 min wait</span>
+                                </div>
+                            </div>
+                            <hr class="border-slate-800">
+                            <div class="space-y-1.5">
+                                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest">Volunteer Status</h3>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 text-xs">Assigned:</span>
+                                    <span class="text-white font-mono text-xs" id="metrics-volunteers">14 Active</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 text-xs">Ramps / Lifts:</span>
+                                    <span class="text-emerald-400 flex items-center gap-1 text-xs"><i data-lucide="check-circle" class="w-3 h-3"></i> Operating</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-reallocate-volunteers" class="mt-4 w-full bg-gradient-to-r from-indigo-600/30 to-violet-600/30 border border-indigo-500/50 hover:from-indigo-600 hover:to-violet-600 text-white transition-all text-xs font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 group">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 group-hover:rotate-12 transition-transform"></i> GenAI Auto-Deploy Volunteers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Row 2: Scenario Engine -->
+            <div class="glass-panel p-4 flex flex-col space-y-4 panel-anim" id="panel-scenario">
+                <div>
+                    <h2 class="font-outfit text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="brain-circuit" class="text-indigo-400 w-5 h-5"></i> GenAI Scenario Simulator &amp; Decision Support
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Trigger live incidents to generate AI mitigations, multilingual announcements, and tactical dispatches.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <button class="scenario-btn text-xs px-3 py-2.5 rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-indigo-500 hover:text-white transition-all text-left flex items-start gap-2" data-scenario="bottleneck">
+                        <i data-lucide="users" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+                        <div><p class="font-bold text-white text-xs">Bottleneck</p><p class="text-[10px] text-slate-400">Gate 3 Overflow</p></div>
+                    </button>
+                    <button class="scenario-btn text-xs px-3 py-2.5 rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-indigo-500 hover:text-white transition-all text-left flex items-start gap-2" data-scenario="transit">
+                        <i data-lucide="bus" class="w-4 h-4 text-rose-400 shrink-0 mt-0.5"></i>
+                        <div><p class="font-bold text-white text-xs">Transit Fail</p><p class="text-[10px] text-slate-400">Shuttle Delay</p></div>
+                    </button>
+                    <button class="scenario-btn text-xs px-3 py-2.5 rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-indigo-500 hover:text-white transition-all text-left flex items-start gap-2" data-scenario="weather">
+                        <i data-lucide="cloud-lightning" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
+                        <div><p class="font-bold text-white text-xs">Storm Alert</p><p class="text-[10px] text-slate-400">Pre-match Storm</p></div>
+                    </button>
+                    <button class="scenario-btn text-xs px-3 py-2.5 rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-indigo-500 hover:text-white transition-all text-left flex items-start gap-2" data-scenario="accessibility">
+                        <i data-lucide="accessibility" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                        <div><p class="font-bold text-white text-xs">Elevator Down</p><p class="text-[10px] text-slate-400">Mobility Outage</p></div>
+                    </button>
+                    <button class="scenario-btn text-xs px-3 py-2.5 rounded-xl border border-slate-700/60 bg-slate-800/40 text-slate-300 hover:border-indigo-500 hover:text-white transition-all text-left flex items-start gap-2" data-scenario="sustainability">
+                        <i data-lucide="recycle" class="w-4 h-4 text-teal-400 shrink-0 mt-0.5"></i>
+                        <div><p class="font-bold text-white text-xs">Waste Surge</p><p class="text-[10px] text-slate-400">Trash Overload</p></div>
+                    </button>
+                </div>
+                <div class="ai-output-box bg-slate-950/80 border border-slate-800 rounded-xl p-4 relative min-h-[180px] flex flex-col justify-between" id="ai-output-container">
+                    <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-indigo-500/15 text-indigo-300 border border-indigo-500/25 px-2.5 py-1 rounded-lg text-[10px] font-mono">
+                        <i data-lucide="sparkles" class="w-3 h-3 animate-spin"></i> GenAI Engine
+                    </div>
+                    <div class="space-y-3" id="scenario-ai-output">
+                        <div>
+                            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Operations Advisor — Standby
+                            </h3>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Select an operational scenario above to trigger the Generative AI Scenario Engine. ArenaOS will synthesize sensor counts, crowd density, and mobility demands to generate optimized response protocols, multilingual announcements, and dispatch coordinates.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-800/60 flex flex-wrap gap-2 items-center justify-between">
+                        <div class="text-[10px] text-slate-500 font-mono">Integrations: <span class="text-slate-400">Digital Signage, Fan App API, Volunteer Fleet</span></div>
+                        <button id="btn-broadcast-alert" class="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 transition-all shadow-lg shadow-indigo-600/20 opacity-40 cursor-not-allowed" disabled>
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Push AI Broadcast
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: AI Dispatcher + Developer Quick Verify -->
+            <div class="glass-panel p-4 flex flex-col space-y-3 panel-anim" id="panel-dispatcher">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="font-outfit text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="megaphone" class="text-indigo-400 w-5 h-5"></i> AI Direct Instructions Dispatcher
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Draft real-time tactical instructions to broadcast to fans or push to volunteer checklists.</p>
+                    </div>
+                    <!-- Developer Quick Verify Button -->
+                    <button id="btn-dev-quick-verify" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/20">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Quick Verify All
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="input-custom-instruction" placeholder="Enter instructions (e.g., Gate 4 is now clear, please divert there...)" class="flex-1 bg-slate-950 border border-slate-800 text-xs rounded-xl px-3.5 py-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 text-slate-200 placeholder-slate-600">
+                </div>
+                <div class="flex flex-wrap gap-2 justify-between items-center">
+                    <div class="flex gap-2">
+                        <button id="btn-send-instruction-fans" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/20">
+                            <i data-lucide="users" class="w-3.5 h-3.5"></i> Broadcast to Fans
+                        </button>
+                        <button id="btn-send-instruction-volunteers" class="bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-teal-600/20">
+                            <i data-lucide="heart" class="w-3.5 h-3.5"></i> Push to Volunteers
+                        </button>
+                    </div>
+                    <div class="flex gap-1.5 items-center flex-wrap mt-2 sm:mt-0">
+                        <span class="text-[10px] text-slate-500 font-mono">Quick Presets:</span>
+                        <button class="preset-instruction-btn bg-slate-800 hover:bg-amber-600/20 hover:border-amber-500/50 text-slate-300 border border-slate-700/50 rounded-lg px-2.5 py-1.5 text-[10px] transition-all" data-text="Attention: Food Court lines are short. Take advantage of 10% early-bird discounts!">🍔 Food Discount</button>
+                        <button class="preset-instruction-btn bg-slate-800 hover:bg-emerald-600/20 hover:border-emerald-500/50 text-slate-300 border border-slate-700/50 rounded-lg px-2.5 py-1.5 text-[10px] transition-all" data-text="Volunteer Alert: High congestion reported near East Plaza escalators. Help guide wheelchair users to Ramps.">♿ ADA Escort</button>
+                        <button class="preset-instruction-btn bg-slate-800 hover:bg-sky-600/20 hover:border-sky-500/50 text-slate-300 border border-slate-700/50 rounded-lg px-2.5 py-1.5 text-[10px] transition-all" data-text="Weather Evacuation Alert: Light rain started. General ticketing holders please seek overhead shelter in Zone C.">⛈️ Shelter Alert</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Sustainability + Telemetry -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-panel p-4 flex flex-col justify-between panel-anim" id="panel-sustainability">
+                    <h2 class="font-outfit text-base font-bold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="leaf" class="text-emerald-400 w-4 h-4"></i> ESG &amp; Environmental Intelligence
+                    </h2>
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <div class="metric-card text-center">
+                            <span class="text-[10px] text-slate-400 block">Carbon Savings</span>
+                            <span class="text-base font-bold text-emerald-400 font-mono" id="sust-carbon">22.4%</span>
+                            <span class="text-[10px] text-slate-500 block">vs Baseline</span>
+                        </div>
+                        <div class="metric-card text-center">
+                            <span class="text-[10px] text-slate-400 block">Waste Diverted</span>
+                            <span class="text-base font-bold text-teal-400 font-mono" id="sust-waste">74.2%</span>
+                            <span class="text-[10px] text-slate-500 block">Recycling rate</span>
+                        </div>
+                        <div class="metric-card text-center">
+                            <span class="text-[10px] text-slate-400 block">Energy Eff.</span>
+                            <span class="text-base font-bold text-amber-400 font-mono" id="sust-energy">18.1%</span>
+                            <span class="text-[10px] text-slate-500 block">Predictive HVAC</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-400 bg-emerald-500/8 border border-emerald-500/25 p-3 rounded-xl">
+                        <span class="font-semibold text-emerald-300 block mb-1 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline"></i> AI Sustainability Tip</span>
+                        <span id="sustainability-tip">Shuttles routed on Low-Emission Corridors. Recommending cooling cycle optimization for Zone C dome based on lowering ambient temperatures.</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 flex flex-col panel-anim" id="panel-telemetry">
+                    <h2 class="font-outfit text-base font-bold text-white flex items-center justify-between mb-3">
+                        <span class="flex items-center gap-2"><i data-lucide="list-todo" class="text-indigo-400 w-4 h-4"></i> Live Telemetry &amp; Anomaly Log</span>
+                        <span class="text-[10px] text-indigo-400 font-mono animate-pulse bg-indigo-500/10 px-2 py-0.5 rounded">STREAMING</span>
+                    </h2>
+                    <div class="bg-slate-950/80 border border-slate-900 rounded-xl p-2.5 h-[150px] overflow-y-auto font-mono text-[11px] text-slate-400 space-y-1.5" id="telemetry-log">
+                        <div><span class="text-slate-600">[18:23:40]</span> GATEWAY: Sensor network synced. 1,420 IoT nodes reporting.</div>
+                        <div><span class="text-slate-600">[18:23:51]</span> TICKETING: 98% of fans scanned. Ticket ingress peak completed.</div>
+                        <div><span class="text-indigo-400">[18:24:02]</span> GENAI: Processed query "Nearest exit" (Español) — redirected via Gate 4.</div>
+                        <div><span class="text-amber-400 font-semibold">[18:24:15]</span> ANOMALY: Escalator 4B in Sector 112 — high vibration detected. Scheduling check.</div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT: Smartphone Simulator -->
+        <section class="hidden lg:flex w-1/3 p-4 bg-slate-950/40 flex-col items-center justify-center relative" id="mobile-section">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+
+            <!-- Mode Toggle -->
+            <div class="mode-toggle-container flex bg-slate-900/90 border border-slate-700/60 p-1.5 rounded-full mb-4 shadow-2xl z-10 relative">
+                <button id="toggle-fan" class="mode-toggle-btn active-mode px-5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i> Fan App
+                </button>
+                <button id="toggle-volunteer" class="mode-toggle-btn inactive-mode px-5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5">
+                    <i data-lucide="heart" class="w-3.5 h-3.5"></i> Volunteer
+                </button>
+            </div>
+
+            <!-- Smartphone Frame -->
+            <div class="smartphone-frame shadow-2xl relative flex flex-col bg-slate-900 border-[8px] border-slate-800 rounded-[36px] w-[350px] h-[680px] overflow-hidden" id="smartphone-frame">
+
+                <!-- Status Bar -->
+                <div class="absolute top-0 inset-x-0 h-6 bg-slate-950 flex items-center justify-between px-5 text-[10px] text-slate-400 font-mono z-50">
+                    <span id="phone-time">18:25</span>
+                    <div class="w-16 h-4 bg-slate-950 rounded-b-xl mx-auto absolute left-1/2 -translate-x-1/2 top-0 flex items-center justify-center">
+                        <span class="w-1.5 h-1.5 bg-slate-800 rounded-full"></span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="wifi" class="w-3 h-3 text-slate-400"></i>
+                        <i data-lucide="battery" class="w-3 h-3 text-slate-400"></i>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col pt-6 overflow-hidden bg-slate-950 text-slate-100" id="phone-app-container">
+
+                    <!-- App Header -->
+                    <div class="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between shadow-md shrink-0">
+                        <div class="flex items-center gap-2">
+                            <div class="bg-gradient-to-br from-indigo-600 to-violet-600 p-1.5 rounded-lg text-white">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="font-outfit text-sm font-bold text-white block leading-none" id="app-header-title">FIFA Arena Concierge</span>
+                                <span class="text-[10px] text-emerald-400 block font-semibold mt-0.5">GenAI Assistant Active</span>
+                            </div>
+                        </div>
+                        <select id="app-language" class="bg-slate-800 border border-slate-700 text-[11px] rounded-lg px-2 py-1 text-slate-200 outline-none focus:border-indigo-500">
+                            <option value="en">🇺🇸 EN</option>
+                            <option value="es">🇪🇸 ES</option>
+                            <option value="fr">🇫🇷 FR</option>
+                            <option value="ar">🇸🇦 AR</option>
+                            <option value="jp">🇯🇵 JP</option>
+                        </select>
+                    </div>
+
+                    <!-- Broadcast Alert -->
+                    <div id="phone-broadcast-alert" class="mx-3 my-2 bg-rose-500/20 border border-rose-500/40 p-3 rounded-xl text-rose-200 text-xs hidden relative shadow-lg broadcast-slide">
+                        <button onclick="dismissBroadcast()" class="broadcast-dismiss-btn absolute top-1.5 right-2.5 text-slate-400 hover:text-white text-sm font-bold">&times;</button>
+                        <div class="flex gap-2">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0"></i>
+                            <div id="phone-broadcast-content" class="text-xs leading-relaxed"></div>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Body -->
+                    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-3" id="phone-app-body">
+
+                        <!-- ─── FAN MODE ─────────────────────────────────── -->
+                        <div id="fan-mode-sections">
+
+                            <!-- Ticket Card with QR and Verification -->
+                            <div class="bg-gradient-to-br from-indigo-900 via-slate-900 to-violet-900/50 border border-indigo-500/25 rounded-2xl p-3.5 shadow-lg relative overflow-hidden ticket-card" id="ticket-card">
+                                <div class="absolute -right-6 -bottom-6 bg-indigo-500/8 w-24 h-24 rounded-full"></div>
+                                <div class="flex justify-between items-start mb-2.5">
+                                    <span class="text-[10px] bg-indigo-500/25 text-indigo-300 font-bold border border-indigo-500/30 px-2.5 py-0.5 rounded-full uppercase">Match Ticket</span>
+                                    <span class="text-[10px] text-slate-400 font-mono font-bold">USA vs MEX</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-center">
+                                    <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                                        <span class="text-[9px] text-slate-500 block uppercase font-bold tracking-wide">Gate</span>
+                                        <span class="font-bold text-white font-mono text-sm" id="app-ticket-gate">Gate 3</span>
+                                    </div>
+                                    <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                                        <span class="text-[9px] text-slate-500 block uppercase font-bold tracking-wide">Section</span>
+                                        <span class="font-bold text-white font-mono text-sm" id="app-ticket-section">112</span>
+                                    </div>
+                                    <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+                                        <span class="text-[9px] text-slate-500 block uppercase font-bold tracking-wide">Row</span>
+                                        <span class="font-bold text-white font-mono text-sm" id="app-ticket-row">24</span>
+                                    </div>
+                                </div>
+                                <!-- QR Code and Verification -->
+                                <div class="flex items-center justify-between mt-3">
+                                    <div id="qrcode" class="bg-white p-1 rounded-lg shadow-lg"></div>
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        <button id="btn-verify-ticket" class="verify-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/20">
+                                            <i data-lucide="scan" class="w-3.5 h-3.5"></i> Verify Ticket
+                                        </button>
+                                        <div id="verification-status" class="text-[10px] text-slate-400 flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-600 inline-block"></span>
+                                            <span>Not Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Seat Selector -->
+                                <div class="mt-3 seat-selector flex items-center gap-2 justify-center">
+                                    <span class="text-[10px] text-slate-400">Change Seat:</span>
+                                    <select id="seat-selector" class="text-[11px] bg-slate-800/80 border border-slate-700 rounded-lg px-2 py-1 text-slate-200 outline-none focus:border-indigo-500">
+                                        <option value="3|112|24">Gate 3 • Sec 112 • Row 24</option>
+                                        <option value="4|105|12">Gate 4 • Sec 105 • Row 12</option>
+                                        <option value="5|120|8">Gate 5 • Sec 120 • Row 8</option>
+                                        <option value="6|98|30">Gate 6 • Sec 98 • Row 30</option>
+                                        <option value="2|130|15">Gate 2 • Sec 130 • Row 15</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Fan Quick Actions -->
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Fan Quick Actions</span>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-indigo-600/20 border border-slate-700/50 hover:border-indigo-500/50 rounded-xl py-2 px-1 transition-all" data-action="directions">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-indigo-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">Gate Directions</span>
+                                    </button>
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-amber-600/20 border border-slate-700/50 hover:border-amber-500/50 rounded-xl py-2 px-1 transition-all" data-action="food">
+                                        <i data-lucide="utensils" class="w-4 h-4 text-amber-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">Food &amp; Drinks</span>
+                                    </button>
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-sky-600/20 border border-slate-700/50 hover:border-sky-500/50 rounded-xl py-2 px-1 transition-all" data-action="restroom">
+                                        <i data-lucide="bath" class="w-4 h-4 text-sky-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">Restrooms</span>
+                                    </button>
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-rose-600/20 border border-slate-700/50 hover:border-rose-500/50 rounded-xl py-2 px-1 transition-all" data-action="firstaid">
+                                        <i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">First Aid</span>
+                                    </button>
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-teal-600/20 border border-slate-700/50 hover:border-teal-500/50 rounded-xl py-2 px-1 transition-all" data-action="lostandfound">
+                                        <i data-lucide="search" class="w-4 h-4 text-teal-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">Lost &amp; Found</span>
+                                    </button>
+                                    <button class="fan-action-btn flex flex-col items-center gap-1 bg-slate-800/70 hover:bg-violet-600/20 border border-slate-700/50 hover:border-violet-500/50 rounded-xl py-2 px-1 transition-all" data-action="exit">
+                                        <i data-lucide="door-open" class="w-4 h-4 text-violet-400"></i>
+                                        <span class="text-[9px] text-slate-300 font-semibold text-center leading-tight">Exit Routes</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Accessibility -->
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Universal Design Settings</span>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <button id="btn-accessibility-highcontrast" class="bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-[10px] font-semibold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 text-slate-300 transition-all">
+                                        <i data-lucide="eye" class="w-3 h-3"></i> High Contrast
+                                    </button>
+                                    <button id="btn-accessibility-tts" class="bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-[10px] font-semibold py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 text-slate-300 transition-all">
+                                        <i data-lucide="volume-2" class="w-3 h-3"></i> Audio-Guide
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Waveform (TTS) -->
+                            <div id="waveform-container" class="hidden bg-slate-900/60 border border-indigo-500/25 rounded-2xl p-3">
+                                <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest block mb-2 flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse inline-block"></span> Audio-Guide Active
+                                </span>
+                                <canvas id="waveform-canvas" class="w-full" height="50"></canvas>
+                            </div>
+
+                            <!-- Wayfinding -->
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Intelligent Navigation</span>
+                                <div class="h-28 bg-slate-950 border border-slate-800/80 rounded-xl relative overflow-hidden" id="wayfinding-map-container">
+                                    <svg id="wayfinding-route" class="w-full h-full" viewBox="0 0 300 120"></svg>
+                                    <div class="absolute bottom-1 right-2 bg-slate-900/80 px-1.5 py-0.5 rounded text-[9px] text-slate-400 font-mono border border-slate-800">Scale: 1:250</div>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
+                                        <input type="checkbox" id="chk-wheelchair" class="accent-indigo-500 rounded focus:ring-0">
+                                        <span class="text-[11px] flex items-center gap-1"><i data-lucide="accessibility" class="w-3 h-3 text-emerald-400"></i> Step-free / Ramps</span>
+                                    </label>
+                                    <span class="text-[11px] font-mono text-indigo-400" id="wayfinding-est">Est: 6 min walk</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── VOLUNTEER MODE ─────────────────────────────── -->
+                        <div id="volunteer-mode-sections" class="hidden space-y-3">
+
+                            <div class="bg-gradient-to-br from-teal-900/60 to-slate-900 border border-teal-500/25 rounded-2xl p-3.5">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="bg-teal-600 p-2 rounded-xl"><i data-lucide="shield-check" class="w-5 h-5 text-white"></i></div>
+                                    <div>
+                                        <p class="font-outfit font-bold text-white text-sm">Volunteer Coordinator</p>
+                                        <p class="text-[10px] text-teal-400">Zone A — East Ingress Lead</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-center">
+                                    <div class="bg-slate-950/60 p-2 rounded-lg border border-teal-800/40">
+                                        <span class="text-[9px] text-slate-500 block uppercase font-bold">Assigned</span>
+                                        <span class="font-bold text-teal-400 font-mono text-sm" id="vol-assigned">14</span>
+                                    </div>
+                                    <div class="bg-slate-950/60 p-2 rounded-lg border border-teal-800/40">
+                                        <span class="text-[9px] text-slate-500 block uppercase font-bold">Status</span>
+                                        <span class="font-bold text-emerald-400 font-mono text-sm">ACTIVE</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Volunteer Commands</span>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-teal-600/20 border border-slate-700/50 hover:border-teal-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="deploy">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-teal-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">Deploy to Zone</span>
+                                    </button>
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-amber-600/20 border border-slate-700/50 hover:border-amber-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="support">
+                                        <i data-lucide="phone-call" class="w-4 h-4 text-amber-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">Request Support</span>
+                                    </button>
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-emerald-600/20 border border-slate-700/50 hover:border-emerald-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="resolved">
+                                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">Mark Resolved</span>
+                                    </button>
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-rose-600/20 border border-slate-700/50 hover:border-rose-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="crowdalert">
+                                        <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">Crowd Alert</span>
+                                    </button>
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-sky-600/20 border border-slate-700/50 hover:border-sky-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="ada">
+                                        <i data-lucide="accessibility" class="w-4 h-4 text-sky-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">ADA Escort</span>
+                                    </button>
+                                    <button class="vol-action-btn flex items-center gap-2 bg-slate-800/70 hover:bg-violet-600/20 border border-slate-700/50 hover:border-violet-500/50 rounded-xl py-2.5 px-3 transition-all" data-vaction="hazard">
+                                        <i data-lucide="shield-x" class="w-4 h-4 text-violet-400 shrink-0"></i>
+                                        <span class="text-[10px] text-slate-300 font-semibold text-left leading-tight">Report Hazard</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 space-y-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Active Directives Feed</span>
+                                <div id="vol-directives-feed" class="space-y-1.5 text-xs max-h-24 overflow-y-auto">
+                                    <div class="flex items-start gap-2 bg-teal-500/10 border border-teal-500/20 rounded-lg p-2 directive-item">
+                                        <i data-lucide="circle" class="w-3 h-3 text-teal-400 shrink-0 mt-0.5"></i>
+                                        <span class="text-teal-200 text-[10px]">Monitor east turnstile access — peak ingress ongoing.</span>
+                                    </div>
+                                    <div class="flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2 directive-item">
+                                        <i data-lucide="clock" class="w-3 h-3 text-amber-400 shrink-0 mt-0.5"></i>
+                                        <span class="text-amber-200 text-[10px]">Assist mobility-impaired fan near Gate 3 Entry.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── CHAT ASSISTANT ────────────────────────────────── -->
+                        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 flex flex-col h-[230px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-between">
+                                <span id="chat-title-label">Ask Concierge</span>
+                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
+                            </span>
+                            <div class="flex-1 overflow-y-auto text-[11px] space-y-2 mb-2 pr-1" id="chat-messages">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <div class="flex flex-wrap gap-1 mb-2 overflow-x-auto shrink-0 pb-1" id="chat-quick-queries">
+                                <button class="quick-chip bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 rounded-full px-2.5 py-1 text-[9px] transition-all whitespace-nowrap" data-query="How do I get to Transit Hub?">🚍 Transit Hub?</button>
+                                <button class="quick-chip bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 rounded-full px-2.5 py-1 text-[9px] transition-all whitespace-nowrap" data-query="Where is the nearest wheelchair ramp?">♿ Ramp?</button>
+                                <button class="quick-chip bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 rounded-full px-2.5 py-1 text-[9px] transition-all whitespace-nowrap" data-query="How long is the food court line?">🍔 Food wait?</button>
+                                <button class="quick-chip bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 rounded-full px-2.5 py-1 text-[9px] transition-all whitespace-nowrap" data-query="Where is the first aid station?">❤️ First Aid?</button>
+                            </div>
+                            <form id="chat-input-form" class="flex gap-1.5 shrink-0">
+                                <input type="text" id="chat-input" placeholder="Type message..." class="flex-1 bg-slate-950 border border-slate-800 text-[11px] rounded-lg px-2.5 py-1.5 outline-none focus:border-indigo-500 focus:ring-0 text-slate-200 placeholder-slate-600">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg p-1.5 transition-all">
+                                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div><!-- /phone-app-body -->
+                </div><!-- /phone-app-container -->
+
+                <div class="h-5 bg-slate-950 flex items-center justify-center shrink-0">
+                    <div class="w-24 h-1 bg-slate-800 rounded-full"></div>
+                </div>
+            </div><!-- /smartphone-frame -->
+        </section>
+
+    </main>
+
+    <script>
+        // ──────────────────────────────────────────────────────────────────────
+        //  FIFA ArenaOS AI — Core Application Script v2.5
+        //  Added: Ticket Verification (QR + Verify button) and Developer Quick Verify
+        // ──────────────────────────────────────────────────────────────────────
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ── Init Lucide ──────────────────────────────────────────
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // ── State ────────────────────────────────────────────────
+            const state = {
+                selectedSector: 'Zone A',
+                activeScenario: null,
+                accessibility: { highContrast: false, tts: false },
+                shuttleCapacity: 75,
+                attendance: 82410,
+                co2Saved: 4.8,
+                language: 'en',
+                wheelchairMode: false,
+                volunteersAllocated: 14,
+                showVolunteers: false,
+                showFlow: false,
+                currentView: 'fan',
+                waveformActive: false,
+                particleAlertLevel: 0,
+                seat: { gate: 'Gate 3', section: '112', row: '24' },
+                // Ticket verification
+                ticketVerified: false,
+                chatHistory: {
+                    fan: [{ role: 'agent',
+                        text: '👋 Hello! I am your AI Stadium Concierge. Ask about restrooms, food lines, transportation, or seat directions.' }],
+                    volunteer: [{ role: 'agent',
+                        text: '📋 Volunteer Command Chat active. Use the buttons below or type a command. You can also ask about operations, crowd status, or request support.' }]
+                }
+            };
+
+            // ── Stadium Sectors ──────────────────────────────────────
+            const sectors = {
+                'Zone A': { name: 'Zone A — Main East Entrance', congestion: 64, waitGate: 28, waitFood: 4, waitRestroom: 12,
+                    volunteers: 14, color: 'rgba(245,158,11,0.7)', poly: [
+                        [380, 50],
+                        [480, 50],
+                        [480, 290],
+                        [380, 290]
+                    ] },
+                'Zone B': { name: 'Zone B — South Fan Zone', congestion: 82, waitGate: 45, waitFood: 18, waitRestroom: 25,
+                    volunteers: 8, color: 'rgba(239,68,68,0.7)', poly: [
+                        [50, 270],
+                        [450, 270],
+                        [450, 330],
+                        [50, 330]
+                    ] },
+                'Zone C': { name: 'Zone C — West General Seating', congestion: 38, waitGate: 12, waitFood: 3, waitRestroom: 5,
+                    volunteers: 10, color: 'rgba(16,185,129,0.7)', poly: [
+                        [10, 50],
+                        [120, 50],
+                        [120, 290],
+                        [10, 290]
+                    ] },
+                'Zone D': { name: 'Zone D — North Ingress', congestion: 48, waitGate: 15, waitFood: 6, waitRestroom: 8,
+                    volunteers: 12, color: 'rgba(16,185,129,0.7)', poly: [
+                        [50, 10],
+                        [450, 10],
+                        [450, 70],
+                        [50, 70]
+                    ] },
+                'Zone E': { name: 'Zone E — Premium VIP Suites', congestion: 20, waitGate: 5, waitFood: 2, waitRestroom: 1,
+                    volunteers: 6, color: 'rgba(16,185,129,0.7)', poly: [
+                        [130, 80],
+                        [220, 80],
+                        [220, 260],
+                        [130, 260]
+                    ] },
+                'Zone F': { name: 'Zone F — Press Box & Transit', congestion: 30, waitGate: 8, waitFood: 1, waitRestroom: 2,
+                    volunteers: 5, color: 'rgba(16,185,129,0.7)', poly: [
+                        [220, 80],
+                        [370, 80],
+                        [370, 260],
+                        [220, 260]
+                    ] }
+            };
+
+            // ── Dynamic volunteer dots generator ──────────────────────
+            function generateVolunteerDots(zoneKey, count) {
+                const poly = sectors[zoneKey].poly;
+                let minX = Infinity,
+                    maxX = -Infinity,
+                    minY = Infinity,
+                    maxY = -Infinity;
+                poly.forEach(p => { if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0]; if (p[1] < minY) minY = p[1]; if (p[
+                        1] > maxY) maxY = p[1]; });
+                const dots = [];
+                let attempts = 0;
+                while (dots.length < count && attempts < 2000) {
+                    attempts++;
+                    const x = minX + Math.random() * (maxX - minX);
+                    const y = minY + Math.random() * (maxY - minY);
+                    if (isPointInPoly([x, y], poly)) {
+                        dots.push({ x, y });
+                    }
+                }
+                while (dots.length < count) {
+                    dots.push({
+                        x: minX + Math.random() * (maxX - minX),
+                        y: minY + Math.random() * (maxY - minY)
+                    });
+                }
+                return dots;
+            }
+
+            let volunteerDotsCache = {};
+
+            function getVolunteerDots(zoneKey) {
+                const count = sectors[zoneKey].volunteers;
+                if (!volunteerDotsCache[zoneKey] || volunteerDotsCache[zoneKey].length !== count) {
+                    volunteerDotsCache[zoneKey] = generateVolunteerDots(zoneKey, count);
+                }
+                return volunteerDotsCache[zoneKey];
+            }
+
+            // ── Crowd flow arrows ────────────────────────────────────
+            const flowArrows = [
+                { x1: 480, y1: 170, x2: 420, y2: 170, color: 'rgba(245,158,11,0.7)' },
+                { x1: 250, y1: 10, x2: 250, y2: 70, color: 'rgba(16,185,129,0.6)' },
+                { x1: 10, y1: 170, x2: 70, y2: 170, color: 'rgba(16,185,129,0.5)' },
+                { x1: 175, y1: 80, x2: 175, y2: 130, color: 'rgba(99,102,241,0.6)' },
+                { x1: 295, y1: 80, x2: 295, y2: 130, color: 'rgba(99,102,241,0.5)' },
+                { x1: 250, y1: 270, x2: 250, y2: 310, color: 'rgba(239,68,68,0.7)' },
+            ];
+
+            // ── Scenarios ─────────────────────────────────────────────
+            const scenarios = {
+                bottleneck: {
+                    name: 'Zone A Turnstile Bottleneck',
+                    severity: 'CRITICAL',
+                    severityColor: 'text-rose-400',
+                    desc: 'Gate 3 Ingress Sensors report critical queue backups (35+ mins wait) due to ticketing reader network glitch.',
+                    impact: 'Zone A congestion spiked to 95%. Risk of crowd crush at eastern gates if not resolved within 8 minutes.',
+                    assessment: 'CRITICAL: Crowding at Gate 3 will cascade to Gate 4 within 15 minutes. Urgent redirection + volunteer surge required.',
+                    actions: [
+                        { icon: 'route', text: 'GenAI Route Diversion: Reroute arriving fans from Gate 3 → Gates 4 & 5 via digital signage.' },
+                        { icon: 'users', text: 'Deploy 10 extra navigation volunteers to Zone A perimeter with handheld crowd-management screens.' },
+                        { icon: 'radio', text: 'Trigger local 5G cell broadcast to fans within 500m of Gate 3 in 5 languages simultaneously.' },
+                        { icon: 'ticket', text: 'Temporarily disable turnstile count validation at Gate 4 to increase throughput by 40%.' },
+                    ],
+                    broadcast: { en: '⚠️ CRITICAL: Gate 3 heavily congested. Please divert to Gate 4 or 5 — guides are active on path.',
+                        es: '⚠️ CRÍTICO: Acceso 3 congestionado. Por favor, diríjase al acceso 4 o 5. Guías disponibles en ruta.',
+                        fr: '⚠️ ALERTE: Porte 3 encombrée. Veuillez vous diriger vers la porte 4 ou 5. Des guides sont en place.',
+                        ar: '⚠️ تنبيه: البوابة 3 مزدحمة. يرجى التوجه للبوابة 4 أو 5 للدخول بسهولة.',
+                        jp: '⚠️ ゲート3混雑中。ゲート4または5へ迂回ください。案内係が誘導中。' },
+                    zoneCongestions: { 'Zone A': 95, 'Zone B': 82, 'Zone C': 38, 'Zone D': 58, 'Zone E': 20, 'Zone F': 30 },
+                    affectedZone: 'Zone A',
+                    appUpdate: { ticketGate: 'Gate 4 (Diverted)' },
+                    alertLevel: 2,
+                },
+                transit: {
+                    name: 'Metrolink Shuttle Outage',
+                    severity: 'HIGH',
+                    severityColor: 'text-amber-400',
+                    desc: 'Line 2 Rapid Transit encounters route blockage. Post-match exit flow delayed for 18,000 transit commuters.',
+                    impact: 'Zone F (Transit Hub) experiencing immediate pedestrian accumulation and parking congestion.',
+                    assessment: 'HIGH: Shuttle boarding delays will cascade to crowding in Zone F. Alternate transport matching activated.',
+                    actions: [
+                        { icon: 'bus', text: 'GenAI Micro-Transit: Redirect 15 reserve low-emission shuttles to Route 3 Bypass immediately.' },
+                        { icon: 'leaf', text: 'Carbon-Aware Rideshare integration: Push carbon offsets to users choosing shared eco-rides.' },
+                        { icon: 'monitor', text: 'Dynamic kiosk updates now displaying live shuttle departure estimates across all 12 transit screens.' },
+                        { icon: 'map-pin', text: 'Open secondary parking egress at Lot C to reduce pedestrian-vehicle conflict at main transit hub.' },
+                    ],
+                    broadcast: { en: '🚍 TRANSIT UPDATE: Shuttle Line 2 delayed. Eco-shuttles dispatched. Follow green line to Transit Hub B.',
+                        es: '🚍 TRÁNSITO: Demoras línea 2. Lanzaderas ecológicas activadas. Siga la línea verde hacia Hub B.',
+                        fr: '🚍 TRANSPORT: Ligne 2 retardée. Navettes écologiques déployées. Suivez la ligne verte vers Hub B.',
+                        ar: '🚍 تحديث النقل: تأخر الخط 2. حافلات بيئية بديلة مُشغَّلة. اتبع المسار الأخضر.',
+                        jp: '🚍 シャトル2号線遅延。臨時エコシャトル運行中。緑の案内線で乗り場Bへ。' },
+                    zoneCongestions: { 'Zone A': 64, 'Zone B': 82, 'Zone C': 38, 'Zone D': 48, 'Zone E': 20, 'Zone F': 88 },
+                    affectedZone: 'Zone F',
+                    appUpdate: { ticketGate: 'Gate 3' },
+                    alertLevel: 1,
+                },
+                weather: {
+                    name: 'Severe Weather Warning',
+                    severity: 'MODERATE',
+                    severityColor: 'text-sky-400',
+                    desc: 'National Weather Service issues Severe Thunderstorm & lightning warning within 10 miles of stadium.',
+                    impact: 'Pre-kickoff crowd — 40,000 outdoor plaza attendees — requires immediate sheltering. Food/concourse zones spike.',
+                    assessment: 'MODERATE: Outdoor plaza entry must hold. AI has opened interior spaces for general admission emergency shelter.',
+                    actions: [
+                        { icon: 'megaphone', text: 'Stadium-wide PA announcement: Hold outdoor plaza entry and seek covered concourse shelter.' },
+                        { icon: 'door-open', text: 'GenAI Concourse Management: Unlocked interior VIP lounge entrances for general admission shelter.' },
+                        { icon: 'wind', text: 'Predictive HVAC: Ventilation adjusted to handle elevated indoor CO₂ from increased occupancy.' },
+                        { icon: 'cloud-off', text: 'Lightning detection system armed — automatic pitch evacuation protocol ready for T-minus 30 min.' },
+                    ],
+                    broadcast: { en: '⛈️ WEATHER ALERT: Lightning warning. Seek shelter in stadium concourses. Kickoff delayed 15 min.',
+                        es: '⛈️ CLIMA ALERT: Alerta rayos. Busque refugio en los pasillos. El inicio se retrasa 15 min.',
+                        fr: '⛈️ METEO ALERT: Alerte foudre. Réfugiez-vous dans les coursives. Coup d\'envoi décalé de 15 min.',
+                        ar: '⛈️ تحذير جوي: عواصف رعدية. يرجى الاحتماء بالممرات الداخلية. تأجيل 15 دقيقة.',
+                        jp: '⛈️ 気象警報: 雷警報。コンコース内へ避難。キックオフ15分遅延。' },
+                    zoneCongestions: { 'Zone A': 78, 'Zone B': 90, 'Zone C': 85, 'Zone D': 80, 'Zone E': 70, 'Zone F': 60 },
+                    affectedZone: 'Zone D',
+                    appUpdate: { ticketGate: 'Gate 3' },
+                    alertLevel: 1,
+                },
+                accessibility: {
+                    name: 'West Suite Elevator Outage',
+                    severity: 'HIGH',
+                    severityColor: 'text-amber-400',
+                    desc: 'Elevator #5 (Primary ADA lift for West Premium suites) experiences electrical fault. Estimated downtime: 45 min.',
+                    impact: 'Wheelchair and mobility-impaired attendees obstructed at West concourse. 12 ticketed mobility-aid users affected.',
+                    assessment: 'HIGH: ADA path obstructed. Rerouting to East Ramps required. Immediate volunteer match dispatched.',
+                    actions: [
+                        { icon: 'navigation', text: 'GenAI Wayfinding: ADA routes in Fan App instantly recalculated to utilize East Ramp elevators.' },
+                        { icon: 'heart-handshake', text: 'Matched 4 nearby accessibility volunteers to mobility-impaired passengers at West concourse.' },
+                        { icon: 'clock', text: 'Priority ADA cart bookings opened. 3 electric mobility carts en-route to affected area.' },
+                        { icon: 'wrench', text: 'Maintenance ticket escalated. Technician dispatch confirmed — ETA 22 minutes.' },
+                    ],
+                    broadcast: { en: '♿ ACCESSIBILITY: West Suite Lift 5 offline. Step-free route diverted to East Ramp. Volunteers ready.',
+                        es: '♿ ACCESIBILIDAD: Ascensor 5 Oeste inactivo. Ruta sin escalones desviada a Rampa Este.',
+                        fr: '♿ ACCESSIBILITÉ: Ascenseur Ouest 5 en panne. Itinéraire PMR dévié vers la rampe Est.',
+                        ar: '♿ المصعد 5 غير متاح. تم تحويل المسار للمنحدر الشرقي. المتطوعون بالانتظار.',
+                        jp: '♿ 西エレベーター5号機停止。東スロープへ迂回。介助スタッフ待機中。' },
+                    zoneCongestions: { 'Zone A': 64, 'Zone B': 82, 'Zone C': 55, 'Zone D': 48, 'Zone E': 40, 'Zone F': 30 },
+                    affectedZone: 'Zone E',
+                    appUpdate: { ticketGate: 'Gate 3' },
+                    alertLevel: 1,
+                },
+                sustainability: {
+                    name: 'Waste Surge — Concourse Zone B',
+                    severity: 'LOW',
+                    severityColor: 'text-teal-400',
+                    desc: 'IoT Smart Trash Bin sensors report 98% capacity overload across Zone B fan concessions. High litter risk.',
+                    impact: 'Visual impact on arena cleanliness & recyclable contamination risk. Intervention needed before post-match exit.',
+                    assessment: 'LOW: Operational efficiency gap. Dispatch cleaning crew and leverage gamified fan participation before exit flow.',
+                    actions: [
+                        { icon: 'truck', text: 'GenAI Waste Scheduling: Dispatch 3 cleaning carts optimized route directly to Zone B recycling bins.' },
+                        { icon: 'gift', text: 'Fan App push: Sustainability points multiplier activated for recycling at Station B (+50 FIFA Points).' },
+                        { icon: 'package', text: 'Vendor packaging directive issued: Reduce single-use plastics by 30% at Zone B concession stands.' },
+                        { icon: 'zap', text: 'AI HVAC optimization: Extend ventilation cycle in Zone B by 8 minutes to reduce odor index.' },
+                    ],
+                    broadcast: { en: '♻️ ECO STADIUM: Support our green legacy! Drop bottles at Zone B recycling for a chance to win prizes.',
+                        es: '♻️ ECO ESTADIO: ¡Ayuda con el legado verde! Recicla en Zona B para ganar premios exclusivos.',
+                        fr: '♻️ ECO STADIUM: Recyclez vos bouteilles en Zone B pour gagner des récompenses exclusives.',
+                        ar: '♻️ الاستدامة: ضع عبواتك في سلة التدوير بالمنطقة ب للفوز بجوائز قيّمة.',
+                        jp: '♻️ エコスタジアム: エリアBでリサイクルして限定グッズをもらおう！' },
+                    zoneCongestions: { 'Zone A': 64, 'Zone B': 85, 'Zone C': 38, 'Zone D': 48, 'Zone E': 20, 'Zone F': 30 },
+                    affectedZone: 'Zone B',
+                    appUpdate: { ticketGate: 'Gate 3' },
+                    alertLevel: 0,
+                }
+            };
+
+            // ── Chatbot Replies ──────────────────────────────────────
+            const chatbotReplies = {
+                en: {
+                    default: "I can help with transit routes, wheelchair access, food queue forecasts, first aid, or real-time event updates. What's your question?",
+                    transit: "🚍 Transit Hub is at South-East Gate (Zone F). Shuttles depart every 5 min. Carbon-neutral rideshare available at Lot C.",
+                    wheelchair: "♿ ArenaOS is fully accessible. Tap 'Step-free / Ramps' above to update your route to ramp-only elevators.",
+                    food: "🍔 Food Court East — 4 min wait. Hot Dog Stand B in Zone B is busier (18 min). East Concourse recommended.",
+                    firstaid: "❤️ First Aid stations at Gates 2, 4, and 6. Medical team is stationed at Zone D North Corridor. Emergency: dial 911.",
+                    lostandfound: "🔍 Lost & Found is at the Main Admin Office near Gate 1 South. Open until 30 min after match ends.",
+                    exit: "🚪 Nearest exits: Gate 4 (East) and Gate 6 (West). Follow green arrow signage. Post-match, use alternate Gate 5.",
+                    spanish: "Select '🇪🇸 ES' in the language selector at the top-right of your screen for full Spanish interface.",
+                    announcement: "Latest broadcast: 'All gates are open. Security lines operating normally. Kickoff in 15 minutes!'"
+                },
+                es: {
+                    default: "Puedo ayudarle con rutas de transporte, accesibilidad, tiempos de espera, primeros auxilios o alertas. ¿Su consulta?",
+                    transit: "🚍 Centro de tránsito en puerta sur-este (Zona F). Lanzaderas cada 5 min. Viajes compartidos ecológicos en Lote C.",
+                    wheelchair: "♿ ArenaOS es totalmente accesible. Active 'Solo rampas' para actualizar su ruta con elevadores sin escalones.",
+                    food: "🍔 Plaza de comida este: 4 min de espera. Puestos en Zona B: 18 min. Sugerimos la plaza este.",
+                    firstaid: "❤️ Primeros auxilios en las puertas 2, 4 y 6. Equipo médico en el corredor norte de la Zona D.",
+                    lostandfound: "🔍 Objetos perdidos en la Oficina Administrativa principal cerca de la Puerta 1 Sur.",
+                    exit: "🚪 Salidas más cercanas: Puerta 4 (Este) y Puerta 6 (Oeste). Siga la señalización de flechas verdes.",
+                    spanish: "El idioma español está activo. Todo el contenido se traduce automáticamente.",
+                    announcement: "Último anuncio: 'Todos los accesos están abiertos. El inicio del partido en 15 minutos.'"
+                },
+                fr: {
+                    default: "Je peux vous aider avec les itinéraires, l'accès handicapé, les files d'attente ou les annonces. Posez votre question.",
+                    transit: "🚍 Le pôle de transit est à la porte sud-est (Zone F). Navettes toutes les 5 min. Covoiturage écolo au parking C.",
+                    wheelchair: "♿ ArenaOS est accessible. Cochez 'Rampes' pour ajuster votre itinéraire GPS vers les ascenseurs équipés.",
+                    food: "🍔 Restauration Est: 4 min d'attente. Zone B: 18 min. Nous recommandons les stands du hall Est.",
+                    firstaid: "❤️ Postes de premiers secours aux portes 2, 4 et 6. Équipe médicale au corridor Nord Zone D.",
+                    lostandfound: "🔍 Objets trouvés au Bureau Administratif Principal près de la Porte 1 Sud.",
+                    exit: "🚪 Sorties les plus proches: Porte 4 (Est) et Porte 6 (Ouest). Suivez les flèches vertes.",
+                    spanish: "Pour l'espagnol, choisissez 'ES' dans le sélecteur de langue en haut à droite.",
+                    announcement: "Dernière annonce: 'Toutes les portes sont ouvertes. Coup d'envoi dans 15 minutes.'"
+                },
+                ar: {
+                    default: "يمكنني مساعدتك في النقل، ممرات الكراسي المتحركة، أوقات الانتظار، الإسعافات الأولية أو التحديثات. ما هو سؤالك؟",
+                    transit: "🚍 محطة النقل عند البوابة الجنوبية الشرقية (المنطقة F). الحافلات تغادر كل 5 دقائق.",
+                    wheelchair: "♿ الملعب مجهز بالكامل لذوي الهمم. فعّل 'منحدرات فقط' لتعديل مسار الخريطة.",
+                    food: "🍔 ساحة المطاعم الشرقية: انتظار 4 دقائق. المنطقة B: 18 دقيقة. ننصح بالتوجه للشرق.",
+                    firstaid: "❤️ مراكز الإسعافات الأولية عند البوابات 2 و4 و6. الفريق الطبي في الممر الشمالي للمنطقة D.",
+                    lostandfound: "🔍 المفقودات في مكتب الإدارة الرئيسي بالقرب من البوابة 1 الجنوبية.",
+                    exit: "🚪 أقرب المخارج: البوابة 4 (شرق) والبوابة 6 (غرب). اتبع الأسهم الخضراء.",
+                    spanish: "اختر 'ES' من قائمة اللغات للتحويل للإسبانية.",
+                    announcement: "آخر إعلان: 'جميع البوابات مفتوحة. انطلاق المباراة بعد 15 دقيقة.'"
+                },
+                jp: {
+                    default: "シャトル便、車椅子ルート、フードコートの待ち時間、救急案内などをサポートします。質問を入力してください。",
+                    transit: "🚍 交通ハブは南東ゲート（エリアF）。シャトルバスは5分間隔。シェアライドは駐車場Cをご利用ください。",
+                    wheelchair: "♿ スタジアムはバリアフリー対応。「スロープ優先」をチェックすると階段なしルートを再計算します。",
+                    food: "🍔 東フードコートの待ち時間は約4分。エリアBは18分待ちと混雑中。東エリアの利用をお勧めします。",
+                    firstaid: "❤️ 救護室はゲート2、4、6にあります。エリアD北コリドーに医療チームが待機中。",
+                    lostandfound: "🔍 忘れ物センターはゲート1南の管理事務所にあります。試合終了後30分まで営業。",
+                    exit: "🚪 最寄りの出口：ゲート4（東）とゲート6（西）。緑の矢印の案内に従ってください。",
+                    spanish: "スペイン語は右上の言語選択メニューで「ES」を選択してください。",
+                    announcement: "現在の放送:「すべての入場口が開いております。キックオフまで15分です」"
+                }
+            };
+
+            // ── Fan Action Responses ──────────────────────────────────
+            const fanActionResponses = {
+                directions: (gate, section, row) =>
+                    `📍 Your seat is in Section ${section}, Row ${row}. From ${gate}, head straight through the East Concourse, take escalator up 1 level, follow the blue Section ${section} signs. Estimated 5 min walk.`,
+                food: "🍔 Food Court East (Level 1): 4 min wait — burgers, hot dogs, nachos, and vegan options available. Zone B Food Stand: 18 min wait. Fan App exclusive: 10% discount active on mobile orders!",
+                restroom: "🚻 Nearest restrooms: 40m east of Gate 3 (Level 1) — currently 2 min wait. Accessible restrooms at the end of East Concourse corridor, fully operational.",
+                firstaid: "❤️ First Aid Station is 60m west of Gate 3 on Level 1. Fully staffed with 2 paramedics. For emergencies, wave to any volunteer wearing a red vest or dial the stadium hotline.",
+                lostandfound: "🔍 Lost & Found Center is at the Main Admin Office near Gate 1 South (follow blue signage). Open until 30 min post-match. Report items online at ArenaOS Fan App → Menu → Lost & Found.",
+                exit: "🚪 Post-match exit plan: Gates 4 & 5 recommended for East Side. Gate 6 for West and Transit Hub. Stay seated for 10 min post-match to allow crowd dispersal. AI routing signage will guide you.",
+            };
+
+            // ── Volunteer Action Responses ────────────────────────────
+            const volActionResponses = {
+                deploy: "📍 Deploy to Zone command sent. Please proceed to Zone A — East Ingress. Your sector briefing: monitor turnstile flow, assist fans with ticket validation errors. Report status every 15 min.",
+                support: "📞 Support request filed. Volunteer Coordinator has been notified. Estimated response time: 3–5 minutes. Your request ID: #VLT-2026-4821. Stay at current position.",
+                resolved: "✅ Incident marked as RESOLVED. Well done! Your action has been logged to the operations dashboard. Move to next priority zone as directed by command center.",
+                crowdalert: "🚨 CROWD ALERT triggered and escalated to Operations Center. Automated rerouting activated. Deploy to crowd edge and assist with fan flow using directional hand signals and ArenaOS wristband.",
+                ada: "♿ ADA Escort mission assigned. Fan requiring assistance is at West Concourse near Section 108. Electric cart dispatched — ETA 2 min. Please escort to East Ramp elevator when cart arrives.",
+                hazard: "⚠️ Hazard report submitted to Safety Team. A maintenance crew has been dispatched. Please secure a 2-meter perimeter around the hazard and use your barrier ribbon until crew arrives. Report ID: #HAZ-2026-1137.",
+            };
+
+            // ── DOM refs ──────────────────────────────────────────────
+            const canvas = document.getElementById('stadium-heatmap');
+            const ctx = canvas.getContext('2d');
+            const telemetryLog = document.getElementById('telemetry-log');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInputForm = document.getElementById('chat-input-form');
+            const chatInput = document.getElementById('chat-input');
+            const appLanguage = document.getElementById('app-language');
+            const chkWheelchair = document.getElementById('chk-wheelchair');
+            const btnAccessibilityHighContrast = document.getElementById('btn-accessibility-highcontrast');
+            const btnAccessibilityTTS = document.getElementById('btn-accessibility-tts');
+            const wayfindingEst = document.getElementById('wayfinding-est');
+            const wayfindingRouteSvg = document.getElementById('wayfinding-route');
+            const btnReallocateVolunteers = document.getElementById('btn-reallocate-volunteers');
+            const toggleFanBtn = document.getElementById('toggle-fan');
+            const toggleVolunteerBtn = document.getElementById('toggle-volunteer');
+            const phoneBroadcastAlert = document.getElementById('phone-broadcast-alert');
+            const phoneBroadcastContent = document.getElementById('phone-broadcast-content');
+            const btnBroadcastAlert = document.getElementById('btn-broadcast-alert');
+            const scenarioAiOutput = document.getElementById('scenario-ai-output');
+            const aiOutputContainer = document.getElementById('ai-output-container');
+            const btnToggleVolunteers = document.getElementById('btn-toggle-volunteers');
+            const btnToggleFlow = document.getElementById('btn-toggle-flow');
+            const seatSelector = document.getElementById('seat-selector');
+            const ticketGateEl = document.getElementById('app-ticket-gate');
+            const ticketSectionEl = document.getElementById('app-ticket-section');
+            const ticketRowEl = document.getElementById('app-ticket-row');
+            const btnVerifyTicket = document.getElementById('btn-verify-ticket');
+            const verificationStatus = document.getElementById('verification-status');
+            const ticketCard = document.getElementById('ticket-card');
+            const btnDevQuickVerify = document.getElementById('btn-dev-quick-verify');
+
+            canvas.width = 500;
+            canvas.height = 340;
+
+            // ── Phone Clock ──────────────────────────────────────────
+            function updatePhoneClock() {
+                const el = document.getElementById('phone-time');
+                if (el) {
+                    const now = new Date();
+                    el.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                }
+            }
+            updatePhoneClock();
+            setInterval(updatePhoneClock, 30000);
+
+            // ── Particle System ──────────────────────────────────────
+            class ParticleSystem {
+                constructor(canvasId) {
+                    this.canvas = document.getElementById(canvasId);
+                    if (!this.canvas) return;
+                    this.ctx = this.canvas.getContext('2d');
+                    this.particles = [];
+                    this.running = true;
+                    this.alertLevel = 0;
+                    this.resize();
+                    window.addEventListener('resize', () => this.resize());
+                    this.initParticles(70);
+                    this.animate();
+                }
+                resize() {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                }
+                initParticles(count) {
+                    this.particles = [];
+                    for (let i = 0; i < count; i++) {
+                        this.particles.push({
+                            x: Math.random() * this.canvas.width,
+                            y: Math.random() * this.canvas.height,
+                            vx: (Math.random() - 0.5) * 0.45,
+                            vy: (Math.random() - 0.5) * 0.45,
+                            r: Math.random() * 1.8 + 0.6,
+                            alpha: Math.random() * 0.45 + 0.12,
+                            pulse: Math.random() * Math.PI * 2,
+                            hue: 220 + Math.random() * 80,
+                        });
+                    }
+                }
+                getParticleColor(p) {
+                    if (this.alertLevel === 2) return `hsla(0, 85%, 65%, `;
+                    if (this.alertLevel === 1) return `hsla(38, 90%, 60%, `;
+                    return `hsla(${p.hue}, 75%, 65%, `;
+                }
+                animate() {
+                    if (!this.running) return;
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    for (const p of this.particles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.pulse += 0.025;
+                        if (p.x < 0) p.x = this.canvas.width;
+                        if (p.x > this.canvas.width) p.x = 0;
+                        if (p.y < 0) p.y = this.canvas.height;
+                        if (p.y > this.canvas.height) p.y = 0;
+                        const alpha = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse));
+                        const col = this.getParticleColor(p);
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        this.ctx.fillStyle = col + alpha + ')';
+                        this.ctx.fill();
+                        const grad = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 5);
+                        grad.addColorStop(0, col + (alpha * 0.25) + ')');
+                        grad.addColorStop(1, col + '0)');
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.r * 5, 0, Math.PI * 2);
+                        this.ctx.fillStyle = grad;
+                        this.ctx.fill();
+                    }
+                    for (let i = 0; i < this.particles.length; i++) {
+                        for (let j = i + 1; j < this.particles.length; j++) {
+                            const dx = this.particles[i].x - this.particles[j].x;
+                            const dy = this.particles[i].y - this.particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 130) {
+                                const a = (1 - dist / 130) * 0.18;
+                                const col = this.getParticleColor(this.particles[i]);
+                                this.ctx.beginPath();
+                                this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                                this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                                this.ctx.strokeStyle = col + a + ')';
+                                this.ctx.lineWidth = 0.6;
+                                this.ctx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(() => this.animate());
+                }
+                setAlertLevel(level) {
+                    this.alertLevel = level;
+                    state.particleAlertLevel = level;
+                }
+            }
+
+            const particleSystem = new ParticleSystem('particle-canvas');
+
+            // ── Waveform Visualizer ──────────────────────────────────
+            class WaveformVisualizer {
+                constructor(canvasId) {
+                    this.canvas = document.getElementById(canvasId);
+                    if (!this.canvas) return;
+                    this.ctx = this.canvas.getContext('2d');
+                    this.bars = 48;
+                    this.animId = null;
+                    this.active = false;
+                    this.resize();
+                    window.addEventListener('resize', () => this.resize());
+                }
+                resize() {
+                    const rect = this.canvas.parentElement?.getBoundingClientRect() || { width: 300 };
+                    this.canvas.width = rect.width || 300;
+                    this.canvas.height = 50;
+                }
+                start() {
+                    this.active = true;
+                    this.animate();
+                }
+                stop() {
+                    this.active = false;
+                    if (this.animId) cancelAnimationFrame(this.animId);
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+                animate() {
+                    if (!this.active) return;
+                    const w = this.canvas.width;
+                    const h = this.canvas.height;
+                    this.ctx.clearRect(0, 0, w, h);
+                    const barW = w / this.bars;
+                    const t = Date.now() * 0.003;
+                    for (let i = 0; i < this.bars; i++) {
+                        const base = 0.25 + 0.75 * Math.abs(Math.sin(i * 0.22 + t) * Math.cos(i * 0.08 + t * 0.7));
+                        const noise = 0.15 * Math.random();
+                        const barH = (base + noise) * h * 0.8;
+                        const x = i * barW + 1;
+                        const y = (h - barH) / 2;
+                        const hue = 220 + (i / this.bars) * 80;
+                        const grad = this.ctx.createLinearGradient(x, y, x, y + barH);
+                        grad.addColorStop(0, `hsl(${hue}, 80%, 65%)`);
+                        grad.addColorStop(1, `hsl(${hue + 25}, 80%, 45%)`);
+                        this.ctx.fillStyle = grad;
+                        this.ctx.beginPath();
+                        if (this.ctx.roundRect) {
+                            this.ctx.roundRect(x, y, Math.max(barW - 2, 1), barH, 2);
+                        } else {
+                            this.ctx.rect(x, y, Math.max(barW - 2, 1), barH);
+                        }
+                        this.ctx.fill();
+                    }
+                    this.animId = requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            const waveform = new WaveformVisualizer('waveform-canvas');
+
+            // ── Helper: isPointInPoly ───────────────────────────────
+            function isPointInPoly(pt, poly) {
+                const [x, y] = pt;
+                let inside = false;
+                for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                    const [xi, yi] = poly[i],
+                        [xj, yj] = poly[j];
+                    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+                        inside = !inside;
+                    }
+                }
+                return inside;
+            }
+
+            // ── Heatmap Draw ──────────────────────────────────────────
+            function drawHeatmap() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+
+                const pitchGrad = ctx.createLinearGradient(125, 75, 375, 265);
+                pitchGrad.addColorStop(0, 'rgba(79,70,229,0.12)');
+                pitchGrad.addColorStop(1, 'rgba(16,185,129,0.08)');
+                ctx.fillStyle = pitchGrad;
+                ctx.fillRect(125, 75, 250, 190);
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(125, 75, 250, 190);
+
+                ctx.beginPath();
+                ctx.arc(250, 170, 45, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(250, 170, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255,255,255,0.18)';
+                ctx.fill();
+
+                Object.keys(sectors).forEach(key => {
+                    const sec = sectors[key];
+                    let congestion = sec.congestion;
+                    if (state.activeScenario && scenarios[state.activeScenario].zoneCongestions[key] !== undefined) {
+                        congestion = scenarios[state.activeScenario].zoneCongestions[key];
+                    }
+                    let fillColor;
+                    if (congestion >= 80) {
+                        fillColor = `rgba(239,68,68,${0.45 + 0.25 * Math.sin(Date.now() * 0.002 + key.length)})`;
+                    } else if (congestion >= 50) {
+                        fillColor = 'rgba(245,158,11,0.55)';
+                    } else {
+                        fillColor = 'rgba(16,185,129,0.45)';
+                    }
+                    let strokeColor = 'rgba(255,255,255,0.18)';
+                    let lineWidth = 1.5;
+                    if (state.selectedSector === key) {
+                        strokeColor = '#6366f1';
+                        lineWidth = 3;
+                    }
+                    ctx.fillStyle = fillColor;
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = lineWidth;
+                    const p = sec.poly;
+                    ctx.beginPath();
+                    ctx.moveTo(p[0][0], p[0][1]);
+                    for (let i = 1; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    const lx = (p[0][0] + p[2][0]) / 2;
+                    const ly = (p[0][1] + p[2][1]) / 2;
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px Outfit, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 5;
+                    ctx.fillText(key, lx, ly);
+                    ctx.font = '10px JetBrains Mono, monospace';
+                    ctx.fillStyle = congestion >= 80 ? '#fca5a5' : congestion >= 50 ? '#fcd34d' : '#6ee7b7';
+                    ctx.fillText(`${congestion}%`, lx, ly + 14);
+                    ctx.shadowBlur = 0;
+                });
+
+                if (state.showVolunteers) {
+                    const pulse = 0.7 + 0.3 * Math.sin(Date.now() * 0.004);
+                    Object.keys(sectors).forEach(zoneKey => {
+                        const dots = getVolunteerDots(zoneKey);
+                        dots.forEach(dot => {
+                            ctx.beginPath();
+                            ctx.arc(dot.x, dot.y, 6 * pulse, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(20,184,166,${0.2 * pulse})`;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(dot.x, dot.y, 3.5, 0, Math.PI * 2);
+                            ctx.fillStyle = '#14b8a6';
+                            ctx.strokeStyle = '#fff';
+                            ctx.lineWidth = 1;
+                            ctx.fill();
+                            ctx.stroke();
+                        });
+                    });
+                    ctx.fillStyle = '#14b8a6';
+                    ctx.beginPath();
+                    ctx.arc(15, 320, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.font = '9px JetBrains Mono, monospace';
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Volunteers', 23, 323);
+                }
+
+                if (state.showFlow) {
+                    const flowPulse = 0.6 + 0.4 * Math.sin(Date.now() * 0.003);
+                    flowArrows.forEach(arrow => {
+                        const dx = arrow.x2 - arrow.x1;
+                        const dy = arrow.y2 - arrow.y1;
+                        const len = Math.sqrt(dx * dx + dy * dy);
+                        const ux = dx / len,
+                            uy = dy / len;
+                        const headLen = 8;
+                        ctx.beginPath();
+                        ctx.moveTo(arrow.x1, arrow.y1);
+                        ctx.lineTo(arrow.x2, arrow.y2);
+                        ctx.strokeStyle = arrow.color.replace(/[\d.]+\)$/, `${0.5 * flowPulse + 0.2})`);
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([4, 3]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                        ctx.beginPath();
+                        ctx.moveTo(arrow.x2, arrow.y2);
+                        ctx.lineTo(arrow.x2 - headLen * (ux + 0.5 * uy), arrow.y2 - headLen * (uy - 0.5 * ux));
+                        ctx.lineTo(arrow.x2 - headLen * (ux - 0.5 * uy), arrow.y2 - headLen * (uy + 0.5 * ux));
+                        ctx.closePath();
+                        ctx.fillStyle = arrow.color;
+                        ctx.fill();
+                    });
+                    ctx.strokeStyle = 'rgba(99,102,241,0.7)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 2]);
+                    ctx.beginPath();
+                    ctx.moveTo(75, 319);
+                    ctx.lineTo(90, 319);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.font = '9px JetBrains Mono, monospace';
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Crowd Flow', 93, 323);
+                }
+                ctx.textAlign = 'center';
+            }
+
+            let heatmapAnimId = null;
+
+            function startHeatmapLoop() {
+                if (heatmapAnimId) cancelAnimationFrame(heatmapAnimId);
+
+                function loop() {
+                    drawHeatmap();
+                    heatmapAnimId = requestAnimationFrame(loop);
+                }
+                loop();
+            }
+
+            function updateHeatmapRendering() {
+                if (state.showVolunteers || state.showFlow) {
+                    startHeatmapLoop();
+                } else {
+                    if (heatmapAnimId) {
+                        cancelAnimationFrame(heatmapAnimId);
+                        heatmapAnimId = null;
+                    }
+                    drawHeatmap();
+                }
+            }
+
+            // ── Sector Click ──────────────────────────────────────────
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
+                const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+                let clicked = null;
+                Object.keys(sectors).forEach(key => {
+                    if (isPointInPoly([x, y], sectors[key].poly)) clicked = key;
+                });
+                if (clicked) {
+                    selectSector(clicked);
+                    logTelemetry(`OPERATOR: Scanned sector ${clicked} — sensor diagnostics retrieved.`);
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo('#panel-heatmap', { boxShadow: '0 0 0 2px rgba(99,102,241,0.7)' }, { boxShadow: '0 0 0 0px rgba(99,102,241,0)',
+                            duration: 0.8, ease: 'power2.out' });
+                    }
+                }
+            });
+
+            function selectSector(key) {
+                state.selectedSector = key;
+                const sec = sectors[key];
+                let congestion = sec.congestion;
+                if (state.activeScenario && scenarios[state.activeScenario].zoneCongestions[key] !== undefined) {
+                    congestion = scenarios[state.activeScenario].zoneCongestions[key];
+                }
+                let statusText = 'Normal',
+                    statusClass = 'text-emerald-400';
+                if (congestion >= 80) { statusText = 'Crowded';
+                    statusClass = 'text-rose-400 font-bold'; } else if (congestion >= 50) { statusText = 'Moderate';
+                    statusClass = 'text-amber-400'; }
+
+                document.getElementById('metrics-zone-id').innerText = sec.name;
+                document.getElementById('metrics-congestion').innerHTML = `<span class="${statusClass}">${congestion}% (${statusText})</span>`;
+
+                const bar = document.getElementById('metrics-congestion-bar');
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(bar, { width: `${congestion}%`, duration: 0.7, ease: 'power2.out' });
+                } else {
+                    bar.style.width = `${congestion}%`;
+                }
+                bar.className =
+                    `h-2 rounded-full congestion-bar-glow ${congestion >= 80 ? 'bg-rose-500' : congestion >= 50 ? 'bg-gradient-to-r from-amber-400 to-rose-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}`;
+
+                document.getElementById('queue-gate').innerText = `${sec.waitGate} min wait`;
+                document.getElementById('queue-gate').className =
+                    `font-mono text-xs ${sec.waitGate >= 25 ? 'text-rose-400 font-bold' : sec.waitGate >= 15 ? 'text-amber-400' : 'text-emerald-400'}`;
+                document.getElementById('queue-food').innerText = `${sec.waitFood} min wait`;
+                document.getElementById('queue-food').className =
+                    `font-mono text-xs ${sec.waitFood >= 15 ? 'text-rose-400 font-bold' : sec.waitFood >= 8 ? 'text-amber-400' : 'text-emerald-400'}`;
+                document.getElementById('queue-restroom').innerText = `${sec.waitRestroom} min wait`;
+                document.getElementById('queue-restroom').className =
+                    `font-mono text-xs ${sec.waitRestroom >= 15 ? 'text-rose-400 font-bold' : sec.waitRestroom >= 8 ? 'text-amber-400' : 'text-emerald-400'}`;
+                document.getElementById('metrics-volunteers').innerText = `${sec.volunteers} Active`;
+
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo('#panel-metrics', { scale: 0.995, borderColor: 'rgba(99,102,241,0.5)' }, { scale: 1,
+                        borderColor: 'rgba(30,41,59,0.7)', duration: 0.5, ease: 'elastic.out(1,0.5)' });
+                }
+                updateHeatmapRendering();
+            }
+
+            // ── Overlay Toggles ──────────────────────────────────────
+            btnToggleVolunteers.addEventListener('click', () => {
+                state.showVolunteers = !state.showVolunteers;
+                btnToggleVolunteers.classList.toggle('active-overlay', state.showVolunteers);
+                updateHeatmapRendering();
+                logTelemetry(`HEATMAP: Volunteer overlay ${state.showVolunteers ? 'enabled' : 'disabled'}.`);
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(btnToggleVolunteers, { scale: 0.9 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' });
+                }
+            });
+
+            btnToggleFlow.addEventListener('click', () => {
+                state.showFlow = !state.showFlow;
+                btnToggleFlow.classList.toggle('active-overlay', state.showFlow);
+                updateHeatmapRendering();
+                logTelemetry(`HEATMAP: Flow overlay ${state.showFlow ? 'enabled' : 'disabled'}.`);
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(btnToggleFlow, { scale: 0.9 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' });
+                }
+            });
+
+            // ── Wayfinding Map ────────────────────────────────────────
+            function drawWayfindingMap() {
+                wayfindingRouteSvg.innerHTML = '';
+                const mapBase = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                mapBase.setAttribute('x', '10');
+                mapBase.setAttribute('y', '10');
+                mapBase.setAttribute('width', '280');
+                mapBase.setAttribute('height', '100');
+                mapBase.setAttribute('rx', '10');
+                mapBase.setAttribute('fill', '#020617');
+                mapBase.setAttribute('stroke', '#1e293b');
+                mapBase.setAttribute('stroke-width', '1.5');
+                wayfindingRouteSvg.appendChild(mapBase);
+
+                [
+                    ['50', '30', '50', '90'],
+                    ['250', '30', '250', '90']
+                ].forEach(([x1, y1, x2, y2]) => {
+                    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    l.setAttribute('x1', x1);
+                    l.setAttribute('y1', y1);
+                    l.setAttribute('x2', x2);
+                    l.setAttribute('y2', y2);
+                    l.setAttribute('stroke', 'rgba(30,41,59,0.8)');
+                    l.setAttribute('stroke-width', '8');
+                    wayfindingRouteSvg.appendChild(l);
+                });
+
+                const gateLabel = state.seat.gate;
+                const isDiverted = state.activeScenario === 'bottleneck';
+                const gateDisplay = isDiverted ? 'Gate 4 ⚠' : gateLabel;
+                const gateColor = isDiverted ? '#f97316' : '#ef4444';
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                g.setAttribute('cx', '40');
+                g.setAttribute('cy', '60');
+                g.setAttribute('r', '6');
+                g.setAttribute('fill', gateColor);
+                g.setAttribute('stroke', '#ffffff');
+                g.setAttribute('stroke-width', '1.5');
+                wayfindingRouteSvg.appendChild(g);
+
+                const gt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                gt.setAttribute('x', '40');
+                gt.setAttribute('y', '48');
+                gt.setAttribute('fill', '#fca5a5');
+                gt.setAttribute('font-size', '8');
+                gt.setAttribute('font-weight', 'bold');
+                gt.setAttribute('text-anchor', 'middle');
+                gt.textContent = gateDisplay;
+                wayfindingRouteSvg.appendChild(gt);
+
+                const s = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                s.setAttribute('cx', '240');
+                s.setAttribute('cy', '60');
+                s.setAttribute('r', '6');
+                s.setAttribute('fill', '#6366f1');
+                s.setAttribute('stroke', '#ffffff');
+                s.setAttribute('stroke-width', '1.5');
+                wayfindingRouteSvg.appendChild(s);
+
+                const st = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                st.setAttribute('x', '240');
+                st.setAttribute('y', '48');
+                st.setAttribute('fill', '#a5b4fc');
+                st.setAttribute('font-size', '8');
+                st.setAttribute('font-weight', 'bold');
+                st.setAttribute('text-anchor', 'middle');
+                st.textContent = `Sec ${state.seat.section}`;
+                wayfindingRouteSvg.appendChild(st);
+
+                const routePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                let pathD, routeColor, estText;
+                if (state.wheelchairMode) {
+                    pathD = 'M 40 60 L 100 60 L 120 30 L 180 30 L 200 60 L 240 60';
+                    routeColor = '#10b981';
+                    estText = 'Est: 9 min (Step-free)';
+                } else {
+                    pathD = 'M 40 60 L 240 60';
+                    routeColor = '#6366f1';
+                    estText = 'Est: 5 min walk';
+                }
+                routePath.setAttribute('d', pathD);
+                routePath.setAttribute('fill', 'none');
+                routePath.setAttribute('stroke', routeColor);
+                routePath.setAttribute('stroke-width', '3');
+                routePath.setAttribute('stroke-linecap', 'round');
+                const totalLen = state.wheelchairMode ? 360 : 200;
+                routePath.setAttribute('stroke-dasharray', totalLen);
+                routePath.setAttribute('stroke-dashoffset', totalLen);
+                wayfindingRouteSvg.appendChild(routePath);
+
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(routePath, { strokeDashoffset: 0, duration: 1.4, ease: 'power1.inOut' });
+                }
+                wayfindingEst.innerText = estText;
+
+                const fanDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                fanDot.setAttribute('cx', '40');
+                fanDot.setAttribute('cy', '60');
+                fanDot.setAttribute('r', '5');
+                fanDot.setAttribute('fill', '#f43f5e');
+                fanDot.setAttribute('stroke', '#ffffff');
+                fanDot.setAttribute('stroke-width', '1.5');
+                wayfindingRouteSvg.appendChild(fanDot);
+
+                if (typeof gsap !== 'undefined') {
+                    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+                    if (state.wheelchairMode) {
+                        tl.to(fanDot, { attr: { cx: 100, cy: 60 }, duration: 1.0, ease: 'none' })
+                            .to(fanDot, { attr: { cx: 120, cy: 30 }, duration: 0.5, ease: 'none' })
+                            .to(fanDot, { attr: { cx: 180, cy: 30 }, duration: 1.0, ease: 'none' })
+                            .to(fanDot, { attr: { cx: 200, cy: 60 }, duration: 0.5, ease: 'none' })
+                            .to(fanDot, { attr: { cx: 240, cy: 60 }, duration: 1.0, ease: 'none' });
+                    } else {
+                        tl.to(fanDot, { attr: { cx: 240 }, duration: 2.5, ease: 'none' });
+                    }
+                }
+            }
+
+            // ── Update seat display ──────────────────────────────────
+            function updateSeatDisplay() {
+                ticketGateEl.textContent = state.seat.gate;
+                ticketSectionEl.textContent = state.seat.section;
+                ticketRowEl.textContent = state.seat.row;
+                const val = `${state.seat.gate.replace('Gate ','')}|${state.seat.section}|${state.seat.row}`;
+                if (seatSelector.value !== val) {
+                    seatSelector.value = val;
+                }
+                drawWayfindingMap();
+                // Regenerate QR code with new seat data
+                generateQR();
+            }
+
+            // ── QR Code Generation ────────────────────────────────────
+            let qrInstance = null;
+
+            function generateQR() {
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
+                const ticketData = `${state.seat.gate}|${state.seat.section}|${state.seat.row}|${Date.now()}`;
+                if (typeof QRCode !== 'undefined') {
+                    qrInstance = new QRCode(qrContainer, {
+                        text: ticketData,
+                        width: 80,
+                        height: 80,
+                        colorDark: '#1e293b',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } else {
+                    // Fallback if QRCode not loaded
+                    qrContainer.innerHTML =
+                        `<div class="text-[8px] text-slate-400 text-center">QR<br>${ticketData.substring(0,12)}</div>`;
+                }
+            }
+
+            // ── Ticket Verification ──────────────────────────────────
+            function setVerificationStatus(verified) {
+                state.ticketVerified = verified;
+                const statusDot = verificationStatus.querySelector('span');
+                const statusText = verificationStatus.querySelector('span:last-child');
+                if (verified) {
+                    ticketCard.classList.add('ticket-verified');
+                    statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block';
+                    statusText.textContent = '✓ Verified';
+                    verificationStatus.className = 'text-[10px] text-emerald-400 flex items-center gap-1 verification-badge';
+                    // GSAP celebration
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(ticketCard, { scale: 0.96, borderColor: '#10b981' }, { scale: 1,
+                            borderColor: '#10b981', duration: 0.6, ease: 'elastic.out(1,0.5)' });
+                        gsap.fromTo('#qrcode', { rotate: -5 }, { rotate: 0, duration: 0.5, ease: 'back.out(2)' });
+                    }
+                    // Log
+                    logTelemetry(`TICKET: Verified ticket ${state.seat.gate} Sec ${state.seat.section} Row ${state.seat.row}`);
+                    appendChatMessage('agent',
+                        `✅ Ticket verified! Gate ${state.seat.gate}, Section ${state.seat.section}, Row ${state.seat.row}. Welcome to the match!`
+                        );
+                } else {
+                    ticketCard.classList.remove('ticket-verified');
+                    statusDot.className = 'w-1.5 h-1.5 rounded-full bg-slate-600 inline-block';
+                    statusText.textContent = 'Not Verified';
+                    verificationStatus.className = 'text-[10px] text-slate-400 flex items-center gap-1';
+                }
+            }
+
+            // ── Verify Ticket Button ──────────────────────────────────
+            btnVerifyTicket.addEventListener('click', function() {
+                // Simulate scanning/verification with a short delay
+                this.disabled = true;
+                this.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Verifying...';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                setTimeout(() => {
+                    // 90% chance of success for realism
+                    const success = Math.random() < 0.9;
+                    if (success) {
+                        setVerificationStatus(true);
+                    } else {
+                        // Failed verification
+                        if (typeof gsap !== 'undefined') {
+                            gsap.fromTo(ticketCard, { borderColor: '#ef4444' }, { borderColor: '#ef4444',
+                                duration: 0.3, repeat: 3, yoyo: true });
+                        }
+                        verificationStatus.querySelector('span:last-child').textContent = '❌ Invalid';
+                        verificationStatus.className = 'text-[10px] text-rose-400 flex items-center gap-1';
+                        logTelemetry(`TICKET: Verification FAILED for ${state.seat.gate} Sec ${state.seat.section}`);
+                        appendChatMessage('agent',
+                            `❌ Ticket verification failed. Please contact the ticket office at Gate 1.`);
+                        state.ticketVerified = false;
+                    }
+                    this.disabled = false;
+                    this.innerHTML = '<i data-lucide="scan" class="w-3.5 h-3.5"></i> Verify Ticket';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 1200);
+            });
+
+            // ── Developer Quick Verify ───────────────────────────────
+            btnDevQuickVerify.addEventListener('click', function() {
+                // Instantly verify the ticket (developer override)
+                setVerificationStatus(true);
+                // Also push to chat and log
+                logTelemetry(`DEV: Quick verify executed for ${state.seat.gate} Sec ${state.seat.section}`);
+                appendChatMessage('agent',
+                    `🔧 Developer Quick Verify: Ticket for Gate ${state.seat.gate}, Section ${state.seat.section}, Row ${state.seat.row} has been force-verified.`
+                    );
+                // Visual feedback on button
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(this, { scale: 0.9 }, { scale: 1, duration: 0.3, ease: 'elastic.out(1,0.5)' });
+                }
+                // Also show a brief toast-like notification in the broadcast area
+                showBroadcast('🔧 Developer Quick Verify: Ticket force-verified successfully.');
+            });
+
+            // ── Seat selector change ────────────────────────────────
+            seatSelector.addEventListener('change', function() {
+                const parts = this.value.split('|');
+                if (parts.length === 3) {
+                    state.seat.gate = `Gate ${parts[0]}`;
+                    state.seat.section = parts[1];
+                    state.seat.row = parts[2];
+                    updateSeatDisplay();
+                    // Reset verification status when seat changes
+                    if (state.ticketVerified) {
+                        setVerificationStatus(false);
+                    }
+                    logTelemetry(`FAN: Seat changed to Gate ${parts[0]}, Section ${parts[1]}, Row ${parts[2]}.`);
+                }
+            });
+
+            // ── Scenario Engine ──────────────────────────────────────
+            const scenarioBtns = document.querySelectorAll('.scenario-btn');
+            scenarioBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    scenarioBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(btn, { scale: 0.92 }, { scale: 1, duration: 0.4, ease: 'back.out(2)' });
+                    }
+                    triggerScenario(btn.getAttribute('data-scenario'));
+                });
+            });
+
+            function triggerScenario(key) {
+                state.activeScenario = key;
+                const sc = scenarios[key];
+                if (particleSystem) particleSystem.setAlertLevel(sc.alertLevel);
+
+                Object.keys(sectors).forEach(zone => {
+                    sectors[zone].congestion = sc.zoneCongestions[zone];
+                });
+                selectSector(sc.affectedZone);
+
+                aiOutputContainer.classList.add('processing');
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(aiOutputContainer, { scale: 0.98, opacity: 0.6 }, { scale: 1, opacity: 1, duration: 0.5,
+                        ease: 'power2.out' });
+                }
+
+                scenarioAiOutput.innerHTML = `
+              <div class="flex items-center gap-3 py-4">
+                <div class="flex gap-1">
+                  <span class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                  <span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                  <span class="w-2 h-2 bg-indigo-300 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                </div>
+                <span class="text-slate-400 text-xs font-mono">GenAI reasoning engine processing scenario…</span>
+              </div>`;
+
+                setTimeout(() => {
+                    renderScenarioOutput(sc);
+                }, 850);
+
+                logTelemetry(`CRISIS CENTER: Scenario "${sc.name}" simulation triggered. AI engine engaging.`);
+
+                if (key === 'bottleneck') {
+                    state.seat.gate = 'Gate 4 (Diverted)';
+                } else {
+                    const parts = seatSelector.value.split('|');
+                    if (parts.length === 3) {
+                        state.seat.gate = `Gate ${parts[0]}`;
+                    }
+                }
+                updateSeatDisplay();
+                // Reset verification on scenario change
+                if (state.ticketVerified) setVerificationStatus(false);
+            }
+
+            function renderScenarioOutput(sc) {
+                const severityBg = sc.severity === 'CRITICAL' ? 'bg-rose-500/15 border-rose-500/35 text-rose-300' :
+                    sc.severity === 'HIGH' ? 'bg-amber-500/15 border-amber-500/35 text-amber-300' :
+                    sc.severity === 'MODERATE' ? 'bg-sky-500/15 border-sky-500/35 text-sky-300' :
+                    'bg-teal-500/15 border-teal-500/35 text-teal-300';
+
+                scenarioAiOutput.innerHTML = `
+              <div class="space-y-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-[10px] px-2 py-0.5 rounded border font-bold font-mono ${severityBg}">${sc.severity}</span>
+                      <h3 class="text-xs font-bold text-white">${sc.name}</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono leading-relaxed">${sc.desc}</p>
+                  </div>
+                </div>
+                <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-[10px] font-bold text-amber-300 block flex items-center gap-1 mb-1">
+                    <i data-lucide="shield-alert" class="w-3 h-3 inline"></i> AI Risk Model Forecast
+                  </span>
+                  <span class="text-xs text-slate-300 leading-relaxed">${sc.assessment}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-teal-400 block mb-1.5 flex items-center gap-1">
+                    <i data-lucide="list-checks" class="w-3.5 h-3.5 inline"></i> Recommended Mitigations
+                  </span>
+                  <ul class="space-y-1.5" id="action-list">
+                    ${sc.actions.map((a, i) => `
+                      <li class="action-item-reveal flex items-start gap-2 text-xs text-slate-300 bg-slate-900/40 border border-slate-800/60 rounded-lg px-2.5 py-1.5" style="opacity:0;transform:translateX(-12px)">
+                        <i data-lucide="${a.icon}" class="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5"></i>
+                        <span class="leading-relaxed">${a.text}</span>
+                      </li>`).join('')}
+                  </ul>
+                </div>
+                <div class="bg-indigo-950/50 p-2.5 rounded-lg border border-indigo-900/50">
+                  <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block mb-1">Multilingual Alert (${state.language.toUpperCase()})</span>
+                  <p class="text-xs text-indigo-200 italic leading-relaxed" id="scenario-alert-text">"${sc.broadcast[state.language]}"</p>
+                </div>
+              </div>`;
+
+                lucide.createIcons();
+
+                const items = document.querySelectorAll('.action-item-reveal');
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(items, { opacity: 1, x: 0, duration: 0.45, stagger: 0.12, ease: 'power2.out', delay: 0.1 });
+                }
+
+                btnBroadcastAlert.disabled = false;
+                btnBroadcastAlert.classList.remove('opacity-40', 'cursor-not-allowed');
+                aiOutputContainer.classList.add('processing');
+
+                if (state.accessibility.tts) speakText(sc.broadcast[state.language]);
+            }
+
+            // ── Broadcast ────────────────────────────────────────────
+            btnBroadcastAlert.addEventListener('click', () => {
+                if (!state.activeScenario) return;
+                const sc = scenarios[state.activeScenario];
+                const alertMsg = sc.broadcast[state.language];
+                showBroadcast(alertMsg);
+
+                if (state.activeScenario === 'bottleneck') {
+                    ticketGateEl.textContent = 'Gate 4 (Diverted)';
+                    ticketGateEl.classList.add('text-rose-400');
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(ticketGateEl, { scale: 1.3 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1,0.5)' });
+                    }
+                } else {
+                    const parts = seatSelector.value.split('|');
+                    if (parts.length === 3) {
+                        ticketGateEl.textContent = `Gate ${parts[0]}`;
+                        ticketGateEl.classList.remove('text-rose-400');
+                    }
+                }
+
+                logTelemetry(`SERVER: Sent localized broadcast push to 84,203 devices in ${state.language.toUpperCase()}.`);
+                appendChatMessage('agent', `🚨 BROADCAST: "${alertMsg}"`);
+            });
+
+            function showBroadcast(msg) {
+                phoneBroadcastContent.innerText = msg;
+                phoneBroadcastAlert.classList.remove('hidden');
+                phoneBroadcastAlert.style.display = 'block';
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(phoneBroadcastAlert, { y: -80, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1,
+                        duration: 0.65, ease: 'bounce.out' });
+                    gsap.fromTo(phoneBroadcastAlert, { boxShadow: '0 0 0 0 rgba(239,68,68,0.6)' }, { boxShadow: '0 0 0 8px rgba(239,68,68,0)',
+                        duration: 1.2, repeat: 2, ease: 'power1.out' });
+                }
+            }
+
+            window.dismissBroadcast = function() {
+                const el = document.getElementById('phone-broadcast-alert');
+                if (el) {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                }
+            };
+
+            // ── Telemetry ────────────────────────────────────────────
+            function logTelemetry(msg) {
+                const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+                const div = document.createElement('div');
+                const isAnomaly = msg.includes('ANOMALY') || msg.includes('CRITICAL') || msg.includes('CRISIS');
+                const isAI = msg.includes('GENAI') || msg.includes('AI') || msg.includes('SERVER') || msg.includes('DEV');
+                div.innerHTML =
+                    `<span class="${isAnomaly ? 'text-amber-500 font-semibold' : isAI ? 'text-indigo-400' : 'text-slate-600'}">[${time}]</span> ${msg}`;
+                telemetryLog.prepend(div);
+                while (telemetryLog.children.length > 20) {
+                    telemetryLog.removeChild(telemetryLog.lastChild);
+                }
+            }
+
+            const logsPool = [
+                'GATEWAY: Access turnstiles counting 144 ingress scans/min.',
+                'HVAC: Zone B thermal sensors adjusted fans down by 4% to match ambient wind.',
+                'SUSTAINABILITY: Recycling Station C container reported 45% capacity. Collection scheduled.',
+                'AI COGNITIVE: Translation index stable. 94% customer query sentiment positive.',
+                'ANOMALY: High vibration index detected on escalator 12A. Scheduled for overnight check.',
+                'ROUTING: Fan redirection from corridor 3 completed. Congestion index down 14%.',
+                'GENAI: Predicted post-match congestion surge at Zone B in T-90 min. Pre-deploying volunteers.',
+                'SERVER: 802 IoT sensor telemetry payloads processed in last 10 seconds.',
+                'VOLUNTEER: Auto-assignment algo matched 3 Spanish-speaking volunteers to Gate 4 fan queries.',
+                'AI COGNITIVE: Weather model updated. No precipitation in next 2 hours. HVAC recalculated.',
+            ];
+            setInterval(() => {
+                logTelemetry(logsPool[Math.floor(Math.random() * logsPool.length)]);
+            }, 10000);
+
+            // ── Volunteer Auto-Deploy ─────────────────────────────────
+            btnReallocateVolunteers.addEventListener('click', () => {
+                const zone = state.selectedSector;
+                sectors[zone].volunteers += 6;
+                state.volunteersAllocated = sectors[zone].volunteers;
+                delete volunteerDotsCache[zone];
+
+                let currentCongestion = sectors[zone].congestion;
+                if (state.activeScenario && scenarios[state.activeScenario].zoneCongestions[zone] !== undefined) {
+                    currentCongestion = scenarios[state.activeScenario].zoneCongestions[zone];
+                }
+                const targetCongestion = Math.max(28, currentCongestion - 28);
+                sectors[zone].congestion = targetCongestion;
+                if (state.activeScenario && scenarios[state.activeScenario].zoneCongestions[zone] !== undefined) {
+                    scenarios[state.activeScenario].zoneCongestions[zone] = targetCongestion;
+                }
+
+                if (typeof gsap !== 'undefined') {
+                    const tl = gsap.timeline();
+                    tl.to(btnReallocateVolunteers, { scale: 0.94, duration: 0.12 })
+                        .to(btnReallocateVolunteers, { scale: 1, duration: 0.35, ease: 'back.out(2)' })
+                        .to(btnReallocateVolunteers, { boxShadow: '0 0 20px rgba(99,102,241,0.5)', duration: 0.2 }, '<')
+                        .to(btnReallocateVolunteers, { boxShadow: '0 0 0px rgba(99,102,241,0)', duration: 0.8 });
+                }
+
+                const volEl = document.getElementById('vol-assigned');
+                if (volEl) volEl.textContent = sectors[zone].volunteers;
+                selectSector(zone);
+                if (state.showVolunteers) updateHeatmapRendering();
+                logTelemetry(
+                    `AI ALLOCATION: Deployed 6 volunteers to ${zone}. New total: ${sectors[zone].volunteers}. Congestion: ${currentCongestion}% → ${targetCongestion}%.`
+                    );
+                appendChatMessage('agent',
+                    `Volunteer Coordinator: "AI reallocated 6 assistants to ${zone}. New volunteer count: ${sectors[zone].volunteers}. Arriving in ~3 min to assist crowd management."`
+                    );
+            });
+
+            // ─── CHAT SYSTEM ──────────────────────────────────────────
+
+            function getCurrentHistory() {
+                return state.chatHistory[state.currentView] || state.chatHistory.fan;
+            }
+
+            function appendChatMessage(role, text) {
+                const history = getCurrentHistory();
+                history.push({ role, text });
+                renderChatMessages();
+            }
+
+            function renderChatMessages() {
+                const container = chatMessages;
+                container.innerHTML = '';
+                const history = getCurrentHistory();
+                history.forEach(msg => {
+                    const div = document.createElement('div');
+                    if (msg.role === 'user') {
+                        div.className = 'chat-bubble-user bg-indigo-600 text-white p-2 rounded-xl self-end text-right chat-message-enter';
+                    } else {
+                        div.className = 'chat-bubble-agent bg-slate-800 border border-slate-700/40 p-2 rounded-xl text-slate-200 chat-message-enter';
+                    }
+                    div.textContent = msg.text;
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function processChatQuery(query) {
+                const q = query.toLowerCase();
+                const dict = chatbotReplies[state.language] || chatbotReplies.en;
+                if (q.match(/transit|shuttle|metro|bus|transport/)) return dict.transit;
+                if (q.match(/wheelchair|ramp|lift|accessible|mobility/)) return dict.wheelchair;
+                if (q.match(/food|wait|queue|eat|drink|burger|hot dog/)) return dict.food;
+                if (q.match(/first aid|medical|doctor|hurt|emergency/)) return dict.firstaid;
+                if (q.match(/lost|found|missing|purse|wallet/)) return dict.lostandfound;
+                if (q.match(/exit|leave|out|escape/)) return dict.exit;
+                if (q.match(/spanish|espanol|español/)) return dict.spanish;
+                if (q.match(/announcement|alert|broadcast|news/)) return dict.announcement;
+                return dict.default;
+            }
+
+            chatInputForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const query = chatInput.value.trim();
+                if (!query) return;
+                appendChatMessage('user', query);
+                chatInput.value = '';
+                setTimeout(() => {
+                    const resp = processChatQuery(query);
+                    appendChatMessage('agent', resp);
+                    if (state.accessibility.tts) speakText(resp);
+                }, 320);
+            });
+
+            document.querySelectorAll('.quick-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const q = chip.getAttribute('data-query');
+                    appendChatMessage('user', q);
+                    setTimeout(() => {
+                        const r = processChatQuery(q);
+                        appendChatMessage('agent', r);
+                        if (state.accessibility.tts) speakText(r);
+                    }, 320);
+                });
+            });
+
+            // ── TTS ────────────────────────────────────────────────────
+            function speakText(text) {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const clean = text.replace(/[⚠️🚨♿🚍♻️🍔❤️🔍🚪🎫📍📋✅🔧]/g, '');
+                    const u = new SpeechSynthesisUtterance(clean);
+                    u.lang = state.language === 'ar' ? 'ar-SA' : state.language === 'es' ? 'es-ES' : state.language ===
+                        'fr' ? 'fr-FR' : state.language === 'jp' ? 'ja-JP' : 'en-US';
+                    window.speechSynthesis.speak(u);
+                }
+            }
+
+            // ── Accessibility ─────────────────────────────────────────
+            btnAccessibilityHighContrast.addEventListener('click', () => {
+                state.accessibility.highContrast = !state.accessibility.highContrast;
+                document.body.classList.toggle('high-contrast-mode', state.accessibility.highContrast);
+                btnAccessibilityHighContrast.classList.toggle('bg-white', state.accessibility.highContrast);
+                btnAccessibilityHighContrast.classList.toggle('text-black', state.accessibility.highContrast);
+                btnAccessibilityHighContrast.classList.toggle('bg-slate-800', !state.accessibility.highContrast);
+                btnAccessibilityHighContrast.classList.toggle('text-slate-300', !state.accessibility.highContrast);
+                logTelemetry(`ACCESSIBILITY: High Contrast ${state.accessibility.highContrast ? 'ON' : 'OFF'}.`);
+            });
+
+            btnAccessibilityTTS.addEventListener('click', () => {
+                state.accessibility.tts = !state.accessibility.tts;
+                const wvContainer = document.getElementById('waveform-container');
+                if (state.accessibility.tts) {
+                    btnAccessibilityTTS.classList.add('bg-white', 'text-black');
+                    btnAccessibilityTTS.classList.remove('bg-slate-800', 'text-slate-300');
+                    document.getElementById('phone-app-container').classList.add('large-text-mode');
+                    wvContainer.classList.remove('hidden');
+                    waveform.resize();
+                    waveform.start();
+                    speakText('Audio-Guide activated. ArenaOS will announce route alerts and updates verbally.');
+                } else {
+                    btnAccessibilityTTS.classList.remove('bg-white', 'text-black');
+                    btnAccessibilityTTS.classList.add('bg-slate-800', 'text-slate-300');
+                    document.getElementById('phone-app-container').classList.remove('large-text-mode');
+                    wvContainer.classList.add('hidden');
+                    waveform.stop();
+                    window.speechSynthesis.cancel();
+                }
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(btnAccessibilityTTS, { scale: 0.9 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1,0.5)' });
+                }
+                logTelemetry(`ACCESSIBILITY: Audio-Guide ${state.accessibility.tts ? 'ON' : 'OFF'}.`);
+            });
+
+            // ── Wheelchair ────────────────────────────────────────────
+            chkWheelchair.addEventListener('change', (e) => {
+                state.wheelchairMode = e.target.checked;
+                drawWayfindingMap();
+                if (e.target.checked) {
+                    logTelemetry('AI ROUTER: Step-free accessibility route recalculated. East Ramp elevators active.');
+                }
+            });
+
+            // ── Language ──────────────────────────────────────────────
+            appLanguage.addEventListener('change', (e) => {
+                state.language = e.target.value;
+                const greeting = state.currentView === 'fan' ?
+                    '👋 Hello! I am your AI Stadium Concierge. Ask about restrooms, food lines, transportation, or seat directions.' :
+                    '📋 Volunteer Command Chat active. Use the buttons below or type a command. You can also ask about operations, crowd status, or request support.';
+                const history = getCurrentHistory();
+                if (history.length > 0 && history[0].role === 'agent') {
+                    history[0].text = greeting;
+                }
+                renderChatMessages();
+                if (state.activeScenario) {
+                    const alertBoxText = document.getElementById('scenario-alert-text');
+                    if (alertBoxText) alertBoxText.innerText = `"${scenarios[state.activeScenario].broadcast[state.language]}"`;
+                }
+                logTelemetry(`SYSTEM: Interface language changed to ${state.language.toUpperCase()}.`);
+            });
+
+            // ── Fan / Volunteer Toggle ──────────────────────────────
+            function updateModeUI(mode) {
+                const isFan = mode === 'fan';
+                state.currentView = mode;
+
+                toggleFanBtn.className = `mode-toggle-btn ${isFan ? 'active-mode' : 'inactive-mode'} px-5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5`;
+                toggleVolunteerBtn.className = `mode-toggle-btn ${!isFan ? 'active-mode' : 'inactive-mode'} px-5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5`;
+
+                const fanSections = document.getElementById('fan-mode-sections');
+                const volSections = document.getElementById('volunteer-mode-sections');
+
+                if (isFan) {
+                    fanSections.classList.remove('hidden');
+                    volSections.classList.add('hidden');
+                    document.getElementById('app-header-title').textContent = 'FIFA Arena Concierge';
+                    document.getElementById('chat-title-label').textContent = 'Ask Concierge';
+                } else {
+                    fanSections.classList.add('hidden');
+                    volSections.classList.remove('hidden');
+                    document.getElementById('app-header-title').textContent = 'Volunteer Coordinator';
+                    document.getElementById('chat-title-label').textContent = 'Command Chat';
+                }
+
+                renderChatMessages();
+
+                if (typeof gsap !== 'undefined') {
+                    const target = isFan ? fanSections : volSections;
+                    gsap.fromTo(target, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.35,
+                        ease: 'power2.out' });
+                }
+
+                logTelemetry(`CLIENT: Switched to ${mode === 'fan' ? 'Fan App' : 'Volunteer Coordinator'} view.`);
+            }
+
+            toggleFanBtn.addEventListener('click', () => updateModeUI('fan'));
+            toggleVolunteerBtn.addEventListener('click', () => updateModeUI('volunteer'));
+
+            // ─── FAN QUICK ACTIONS ─────────────────────────────────────
+            document.querySelectorAll('.fan-action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    let resp;
+                    if (action === 'directions') {
+                        resp = fanActionResponses.directions(state.seat.gate, state.seat.section, state.seat.row);
+                    } else {
+                        resp = fanActionResponses[action];
+                    }
+                    if (!resp) return;
+
+                    if (typeof gsap !== 'undefined') {
+                        gsap.timeline()
+                            .to(this, { scale: 0.88, duration: 0.1 })
+                            .to(this, { scale: 1, duration: 0.35, ease: 'elastic.out(1,0.4)' });
+                        gsap.to(this, { boxShadow: '0 0 16px rgba(99,102,241,0.5)', duration: 0.15, yoyo: true,
+                            repeat: 1 });
+                    }
+
+                    this.classList.add('triggered');
+                    setTimeout(() => this.classList.remove('triggered'), 1500);
+                    appendChatMessage('agent', resp);
+                    if (state.accessibility.tts) speakText(resp);
+                    logTelemetry(`FAN APP: Quick action "${action}" triggered.`);
+
+                    if (action === 'firstaid' || action === 'lostandfound') {
+                        const feed = document.getElementById('vol-directives-feed');
+                        if (feed) {
+                            const label = action === 'firstaid' ? 'Medical assistance needed' : 'Lost item reported';
+                            const item = document.createElement('div');
+                            item.className =
+                                'flex items-start gap-2 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2 directive-item';
+                            item.innerHTML =
+                                `<i data-lucide="alert-circle" class="w-3 h-3 text-rose-400 shrink-0 mt-0.5"></i><span class="text-rose-200 text-[10px]">Fan request: ${label} near ${state.seat.gate}.</span>`;
+                            feed.insertBefore(item, feed.firstChild);
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                            while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+                        }
+                    }
+                });
+            });
+
+            // ─── VOLUNTEER ACTION BUTTONS ──────────────────────────────
+            document.querySelectorAll('.vol-action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.getAttribute('data-vaction');
+                    const resp = volActionResponses[action] || 'Action acknowledged. Coordinator notified.';
+
+                    if (typeof gsap !== 'undefined') {
+                        gsap.timeline()
+                            .to(this, { scale: 0.88, duration: 0.1 })
+                            .to(this, { scale: 1, duration: 0.35, ease: 'elastic.out(1,0.4)' });
+                        gsap.to(this, { boxShadow: '0 0 16px rgba(20,184,166,0.5)', duration: 0.15, yoyo: true,
+                            repeat: 1 });
+                    }
+
+                    this.classList.add('triggered');
+                    setTimeout(() => this.classList.remove('triggered'), 1800);
+                    appendChatMessage('agent', resp);
+                    if (state.accessibility.tts) speakText(resp);
+
+                    if (action === 'crowdalert' || action === 'hazard' || action === 'deploy') {
+                        const feed = document.getElementById('vol-directives-feed');
+                        if (feed) {
+                            const iconMap = { crowdalert: 'alert-triangle', hazard: 'shield-x', deploy: 'map-pin' };
+                            const colorMap = { crowdalert: 'rose', hazard: 'violet', deploy: 'teal' };
+                            const c = colorMap[action] || 'teal';
+                            const actionLabels = {
+                                crowdalert: 'Crowd alert issued — monitoring Zone A.',
+                                hazard: 'Hazard reported — crew dispatched.',
+                                deploy: 'Deployment confirmed — proceeding to sector.'
+                            };
+                            const item = document.createElement('div');
+                            item.className =
+                                `flex items-start gap-2 bg-${c}-500/10 border border-${c}-500/20 rounded-lg p-2 directive-item`;
+                            item.innerHTML =
+                                `<i data-lucide="${iconMap[action]}" class="w-3 h-3 text-${c}-400 shrink-0 mt-0.5"></i><span class="text-${c}-200 text-[10px]">${actionLabels[action]}</span>`;
+                            feed.insertBefore(item, feed.firstChild);
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                            while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+                        }
+                    }
+                    logTelemetry(`VOLUNTEER: Command "${action}" executed.`);
+                });
+            });
+
+            // ── AI Instructions Dispatcher ─────────────────────────────
+            const inputCustomInstruction = document.getElementById('input-custom-instruction');
+            const btnSendInstructionFans = document.getElementById('btn-send-instruction-fans');
+            const btnSendInstructionVolunteers = document.getElementById('btn-send-instruction-volunteers');
+
+            document.querySelectorAll('.preset-instruction-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    inputCustomInstruction.value = btn.getAttribute('data-text');
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(inputCustomInstruction, { borderColor: 'rgba(99,102,241,0.8)',
+                            boxShadow: '0 0 0 3px rgba(99,102,241,0.2)' }, { borderColor: 'rgba(30,41,59,0.7)',
+                            boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.9, ease: 'power2.out' });
+                    }
+                });
+            });
+
+            btnSendInstructionFans.addEventListener('click', () => {
+                const text = inputCustomInstruction.value.trim() ||
+                    "Attention Fans: Please check dynamic signs for updated path routings.";
+                updateModeUI('fan');
+                showBroadcast(text);
+                logTelemetry(`AI OPERATOR: Broadcast to fans: "${text}"`);
+                appendChatMessage('agent', `📢 OPERATOR BROADCAST: "${text}"`);
+                inputCustomInstruction.value = '';
+                if (state.accessibility.tts) speakText(text);
+            });
+
+            btnSendInstructionVolunteers.addEventListener('click', () => {
+                const text = inputCustomInstruction.value.trim() ||
+                    "Volunteer Directive: Reroute pedestrian flows near Turnstile Block C.";
+                updateModeUI('volunteer');
+                const feed = document.getElementById('vol-directives-feed');
+                if (feed) {
+                    const item = document.createElement('div');
+                    item.className =
+                        'flex items-start gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-2 directive-item';
+                    item.innerHTML =
+                        `<i data-lucide="send" class="w-3 h-3 text-indigo-400 shrink-0 mt-0.5"></i><span class="text-indigo-200 text-[10px]">${text}</span>`;
+                    feed.insertBefore(item, feed.firstChild);
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    while (feed.children.length > 6) feed.removeChild(feed.lastChild);
+                }
+                logTelemetry(`AI DISPATCH: Task pushed to volunteer log: "${text}"`);
+                appendChatMessage('agent',
+                    `📋 DIRECTIVE DISPATCHED:\n"${text}"\n\nStatus: [ ] ACTIVE — Proceed to location`);
+                inputCustomInstruction.value = '';
+                if (state.accessibility.tts) speakText(`New volunteer task dispatched. Check your active directives.`);
+            });
+
+            // ── GSAP Entrance Animations ──────────────────────────────
+            function initEntranceAnimations() {
+                if (typeof gsap === 'undefined') {
+                    document.querySelectorAll('.panel-anim').forEach(p => {
+                        p.style.opacity = '1';
+                        p.style.transform = 'none';
+                    });
+                    return;
+                }
+                const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+                tl.from('#main-header', { y: -60, opacity: 0, duration: 0.65 })
+                    .from('.pulse-ring-container', { scale: 0.6, opacity: 0, duration: 0.5, ease: 'back.out(2)' },
+                        '-=0.3')
+                    .from('#telemetry-ticker > div', { y: -20, opacity: 0, duration: 0.4, stagger: 0.08 }, '-=0.2')
+                    .to('.panel-anim', { opacity: 1, y: 0, duration: 0.55, stagger: 0.1 }, '-=0.2')
+                    .from('#smartphone-frame', { x: 60, opacity: 0, scale: 0.96, duration: 0.7,
+                        ease: 'back.out(1.2)' }, '-=0.5');
+
+                const targets = [
+                    { el: document.getElementById('telemetry-attendance'), to: 82410, format: (v) =>
+                        `${Math.round(v).toLocaleString()} / 83,000` },
+                    { el: document.getElementById('sust-carbon'), to: 22.4, format: (v) => `${v.toFixed(1)}%` },
+                    { el: document.getElementById('sust-waste'), to: 74.2, format: (v) => `${v.toFixed(1)}%` },
+                    { el: document.getElementById('sust-energy'), to: 18.1, format: (v) => `${v.toFixed(1)}%` },
+                ];
+                targets.forEach(({ el, to, format }) => {
+                    if (!el) return;
+                    const proxy = { val: 0 };
+                    gsap.to(proxy, {
+                        val: to,
+                        duration: 2.0,
+                        ease: 'power2.out',
+                        delay: 0.6,
+                        onUpdate: function() { el.textContent = format(proxy.val); }
+                    });
+                });
+            }
+
+            // ── Ticker ──────────────────────────────────────────────────
+            setInterval(() => {
+                const el = document.getElementById('telemetry-latency');
+                if (el) {
+                    const v = 120 + Math.floor(Math.random() * 60);
+                    el.textContent = `${v}ms`;
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(el, { opacity: 0.5 }, { opacity: 1, duration: 0.4 });
+                    }
+                }
+            }, 5000);
+
+            // ── Init ────────────────────────────────────────────────────
+            selectSector('Zone A');
+            state.seat = { gate: 'Gate 3', section: '112', row: '24' };
+            updateSeatDisplay();
+            // Generate initial QR
+            generateQR();
+
+            state.chatHistory.fan = [{ role: 'agent',
+                text: '👋 Hello! I am your AI Stadium Concierge. Ask about restrooms, food lines, transportation, or seat directions.' }];
+            state.chatHistory.volunteer = [{ role: 'agent',
+                text: '📋 Volunteer Command Chat active. Use the buttons below or type a command. You can also ask about operations, crowd status, or request support.' }];
+            renderChatMessages();
+
+            logTelemetry('SYSTEM: ArenaOS v2.5 initialization complete. Ticket verification & QR added.');
+            logTelemetry('GENAI: Gemini 2.0 Scenario Engine online. 5 incident patterns preloaded.');
+
+            updateModeUI('fan');
+
+            setTimeout(initEntranceAnimations, 100);
+
+            // ── Chat auto-scroll ──────────────────────────────────────
+            const chatObserver = new MutationObserver(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+            chatObserver.observe(chatMessages, { childList: true, subtree: true });
+
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    chatInputForm.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            console.log('🏟️ FIFA ArenaOS AI v2.5 — Ticket verification, QR, and developer quick-verify active.');
+        });
+    </script>
+</body>
+</html>
