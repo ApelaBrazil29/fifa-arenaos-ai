@@ -2,6 +2,8 @@
 
 > **Generative AI Venue Management & Fan Experience Platform**
 
+Live Demo: https://apelabrazil29.github.io/fifa-arenaos-ai/
+
 A cutting-edge stadium operations command center powered by generative AI, designed to revolutionize FIFA World Cup 2026 venue management, fan engagement, and operational efficiency.
 
 ---
